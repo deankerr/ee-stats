@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ClientProviders } from './client-providers'
+import { ThemeProvider } from 'next-themes'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,8 +16,10 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'eestats',
-  description: 'eestats',
+  title: {
+    template: '%s | ee-stats',
+    default: 'ee-stats',
+  },
 }
 
 export default function RootLayout({
@@ -25,14 +28,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      {/* <head>
-        <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
-      </head> */}
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ClientProviders>
-          <NuqsAdapter>{children}</NuqsAdapter>
-        </ClientProviders>
+        <NuqsAdapter>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ClientProviders>{children}</ClientProviders>
+          </ThemeProvider>
+        </NuqsAdapter>
       </body>
     </html>
   )

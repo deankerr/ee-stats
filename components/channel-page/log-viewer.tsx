@@ -35,7 +35,7 @@ export function LogViewer() {
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className="flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[0.5lh] pt-[3lh]"
+      className="flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[0.5lh] pt-[4lh]"
     >
       <LoadingTerminalSpinner spinners />
 
