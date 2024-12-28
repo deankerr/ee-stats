@@ -1,10 +1,10 @@
 'use client'
 
-import { Input } from './ui/input'
+import { Input } from '../ui/input'
 import { useQueryState } from 'nuqs'
 import { SearchIcon, XIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Button } from './ui/button'
+import { Button } from '../ui/button'
 
 export function SearchInput({ className }: { className?: string }) {
   const [search, setSearch] = useQueryState('search')

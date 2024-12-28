@@ -78,10 +78,18 @@
   * {
     @apply border-border;
   }
-  html {
-    @apply overflow-y-scroll;
-  }
+
   body {
-    @apply bg-background text-foreground font-mono antialiased min-h-dvh;
+    @apply min-h-dvh overscroll-y-none bg-background font-mono text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .skeleton-lines {
+    background-image: linear-gradient(hsl(var(--primary) / 0.1) 1lh, transparent 1lh);
+    background-size: 100% calc(1lh + 2px); /* Line height + gap */
+    background-position: bottom;
+    width: 100%;
+    min-height: 100%;
   }
 }

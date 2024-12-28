@@ -1,4 +1,4 @@
-import { ChannelPage } from '@/components/channel-page'
+import { ChannelPage } from '@/components/channel-page/channel-page'
 
 export default async function Page({ params }: { params: Promise<{ channel: string }> }) {
   const channel = (await params).channel
