@@ -1,7 +1,7 @@
-import { LogViewPage } from '@/components/log-view'
+import { ChannelPage } from '@/components/channel-page'
 
 export default async function Page({ params }: { params: Promise<{ channel: string }> }) {
   const channel = (await params).channel
 
-  return <LogViewPage channel={channel} />
+  return <ChannelPage channel={channel} />
 }
