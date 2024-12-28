@@ -1,24 +1,20 @@
 import { api } from '@/convex/_generated/api'
 import { cn } from '@/lib/utils'
 import { usePaginatedQuery } from 'convex/react'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { CircleDashedIcon, CircleIcon } from 'lucide-react'
 import { memo, useEffect } from 'react'
-import { channelEventItemsAtom, loaderEnabledAtom, requestLoadMoreAtom } from './store'
+import { channelEventItemsAtom, requestLoadMoreAtom } from './store'
 
-const initialNumItems = 1000
-const loadMoreNumItems = 1000
+const initialNumItems = 200
+const loadMoreNumItems = 200
 
 export const ChannelLogLoader = memo(({ channel }: { channel: string }) => {
-  const loaderEnabled = useAtomValue(loaderEnabledAtom)
-
-  const { results, isLoading, status, loadMore } = usePaginatedQuery(
+  const { results, isLoading, loadMore } = usePaginatedQuery(
     api.events.paginate,
     { channel },
     { initialNumItems },
   )
-
-  useEffect(() => console.log(results.length, isLoading, status))
 
   const setChannelEventItems = useSetAtom(channelEventItemsAtom)
   useEffect(() => {
@@ -28,11 +24,9 @@ export const ChannelLogLoader = memo(({ channel }: { channel: string }) => {
 
   const [requestLoadMore, setRequestLoadMore] = useAtom(requestLoadMoreAtom)
   useEffect(() => {
-    if (requestLoadMore) {
-      if (!isLoading && loaderEnabled) loadMore(loadMoreNumItems)
-      setRequestLoadMore(false)
-    }
-  }, [loadMore, requestLoadMore, setRequestLoadMore, isLoading, loaderEnabled])
+    if (requestLoadMore && !isLoading) loadMore(loadMoreNumItems)
+    setRequestLoadMore(false)
+  }, [loadMore, requestLoadMore, setRequestLoadMore, isLoading])
 
   return (
     <div className={cn('stack flex-none')} onClick={() => loadMore(loadMoreNumItems)}>
@@ -43,9 +37,7 @@ export const ChannelLogLoader = memo(({ channel }: { channel: string }) => {
 ChannelLogLoader.displayName = 'ChannelLogLoader'
 
 function Indicator({ n, isLoading }: { n?: number; isLoading: boolean }) {
-  const isActive = typeof n === 'number'
-
-  const Icon = isLoading || !isActive ? CircleDashedIcon : CircleIcon
+  const Icon = isLoading ? CircleDashedIcon : CircleIcon
 
   return (
     <div className="grid place-content-center place-items-center px-1 text-xs text-muted-foreground [&>*]:col-start-1 [&>*]:row-start-1">

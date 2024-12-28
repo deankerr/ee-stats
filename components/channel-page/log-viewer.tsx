@@ -1,10 +1,10 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Loader2Icon } from 'lucide-react'
-import { memo, useCallback, useRef } from 'react'
+import { memo, useCallback, useEffect, useRef } from 'react'
 import { channelEventItemsAtom, requestLoadMoreAtom } from './store'
 import { LoadingTerminalSpinner } from './terminal-spinner'
 
-const atTopThreshold = 20
+const atTopThreshold = 30
 
 export function LogViewer() {
   const channelEventItems = useAtomValue(channelEventItemsAtom)
@@ -23,13 +23,21 @@ export function LogViewer() {
     lastScrollTop.current = containerRef.current.scrollTop
   }, [setRequestLoadMore])
 
+  const initialScrollToEnd = useRef(false)
+  useEffect(() => {
+    if (containerRef.current && !initialScrollToEnd.current && channelEventItems?.length) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight
+      initialScrollToEnd.current = true
+    }
+  }, [channelEventItems])
+
   return (
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className="flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[1lh] pt-[3lh]"
+      className="flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[0.5lh] pt-[3lh]"
     >
-      <LoadingTerminalSpinner spinners={false} />
+      <LoadingTerminalSpinner spinners />
 
       <div className="flex flex-col gap-0.5 px-[1ch]">
         {channelEventItems?.map((item) => (
