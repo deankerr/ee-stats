@@ -173,7 +173,13 @@ export const TerminalSpinner = ({ type }: { type: keyof typeof styles }) => {
   )
 }
 
-export function LoadingTerminalSpinner({ className }: { className?: string }) {
+export function LoadingTerminalSpinner({
+  className,
+  spinners = true,
+}: {
+  className?: string
+  spinners?: boolean
+}) {
   return (
     <div
       className={cn(
@@ -181,9 +187,9 @@ export function LoadingTerminalSpinner({ className }: { className?: string }) {
         className,
       )}
     >
-      <TerminalSpinner type="old" />
+      {spinners && <TerminalSpinner type="old" />}
       {'   LOADING   '}
-      <TerminalSpinner type="old" />
+      {spinners && <TerminalSpinner type="old" />}
     </div>
   )
 }

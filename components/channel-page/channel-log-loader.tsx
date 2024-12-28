@@ -3,55 +3,40 @@ import { cn } from '@/lib/utils'
 import { usePaginatedQuery } from 'convex/react'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { CircleDashedIcon, CircleIcon } from 'lucide-react'
-import { memo, useCallback, useEffect } from 'react'
-import { channelEventsAtom, loaderEnabledAtom, requestLoadMoreAtom } from './store'
+import { memo, useEffect } from 'react'
+import { channelEventItemsAtom, loaderEnabledAtom, requestLoadMoreAtom } from './store'
+
+const initialNumItems = 1000
+const loadMoreNumItems = 1000
 
 export const ChannelLogLoader = memo(({ channel }: { channel: string }) => {
   const loaderEnabled = useAtomValue(loaderEnabledAtom)
-  const logEvents = usePaginatedQuery(api.events.paginate, { channel }, { initialNumItems: 100 })
 
-  const load100 = useCallback(() => {
-    console.log('new load func')
-    if (loaderEnabled) logEvents.loadMore(100)
-  }, [loaderEnabled, logEvents])
+  const { results, isLoading, status, loadMore } = usePaginatedQuery(
+    api.events.paginate,
+    { channel },
+    { initialNumItems },
+  )
 
-  const setChannelEvents = useSetAtom(channelEventsAtom)
+  useEffect(() => console.log(results.length, isLoading, status))
+
+  const setChannelEventItems = useSetAtom(channelEventItemsAtom)
   useEffect(() => {
-    setChannelEvents((prev) => {
-      if (prev !== logEvents.results) {
-        console.log('set', logEvents.results.length)
-        return logEvents.results
-      }
-      console.log('no set')
-    })
-  }, [logEvents.results, setChannelEvents])
+    console.log('set', results.length)
+    setChannelEventItems(results.reverse())
+  }, [results, setChannelEventItems])
 
-  const [loadMore, setLoadMore] = useAtom(requestLoadMoreAtom)
+  const [requestLoadMore, setRequestLoadMore] = useAtom(requestLoadMoreAtom)
   useEffect(() => {
-    setLoadMore((prev) => {
-      if (prev) {
-        if (logEvents.status === 'CanLoadMore') {
-          console.log('load')
-          load100()
-          return true
-        }
-        console.log('stop')
-        return false
-      }
-      console.log('skip')
-      return false
-    })
-  }, [load100, loadMore, logEvents, setLoadMore])
+    if (requestLoadMore) {
+      if (!isLoading && loaderEnabled) loadMore(loadMoreNumItems)
+      setRequestLoadMore(false)
+    }
+  }, [loadMore, requestLoadMore, setRequestLoadMore, isLoading, loaderEnabled])
 
   return (
-    <div
-      className={cn(
-        'grid flex-none place-content-center place-items-center [&>*]:col-start-1 [&>*]:row-start-1',
-        loadMore && 'bg-yellow-400',
-      )}
-      onClick={() => logEvents.loadMore(200)}
-    >
-      <Indicator n={logEvents.results.length} isLoading={logEvents.isLoading} />
+    <div className={cn('stack flex-none')} onClick={() => loadMore(loadMoreNumItems)}>
+      <Indicator n={results.length} isLoading={isLoading} />
     </div>
   )
 })

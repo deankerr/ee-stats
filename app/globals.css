@@ -92,4 +92,8 @@
     width: 100%;
     min-height: 100%;
   }
+
+  .stack {
+    @apply grid place-content-center place-items-center [&>*]:col-start-1 [&>*]:row-start-1;
+  }
 }

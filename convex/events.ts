@@ -5,7 +5,7 @@ import type { Doc } from './_generated/dataModel'
 import { mutation, query } from './_generated/server'
 import schema from './schema'
 
-export type LogEvent = Doc<'events'>
+export type LogEventItem = Doc<'events'>
 
 export const add = mutation({
   args: {

@@ -1,24 +1,48 @@
-import { cn } from '@/lib/utils'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { Loader2Icon } from 'lucide-react'
 import { memo, useCallback, useRef } from 'react'
+import { channelEventItemsAtom, requestLoadMoreAtom } from './store'
 import { LoadingTerminalSpinner } from './terminal-spinner'
-import { channelEventsAtom, requestLoadMoreAtom } from './store'
 
-const istime = false
+const atTopThreshold = 20
+
+export function LogViewer() {
+  const channelEventItems = useAtomValue(channelEventItemsAtom)
+  const setRequestLoadMore = useSetAtom(requestLoadMoreAtom)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const lastScrollTop = useRef<number>(0)
+
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current) return
+    const isScrollingUp = containerRef.current.scrollTop < lastScrollTop.current
+    if (containerRef.current.scrollTop < atTopThreshold && isScrollingUp) {
+      setRequestLoadMore(true)
+    }
+
+    lastScrollTop.current = containerRef.current.scrollTop
+  }, [setRequestLoadMore])
+
+  return (
+    <div
+      ref={containerRef}
+      onScroll={handleScroll}
+      className="flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[1lh] pt-[3lh]"
+    >
+      <LoadingTerminalSpinner spinners={false} />
+
+      <div className="flex flex-col gap-0.5 px-[1ch]">
+        {channelEventItems?.map((item) => (
+          <LogItem key={item._id} name={item.name} content={item.content} timestamp={item.timestamp} />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function formatTimestamp(timestamp: number): string {
-  if (istime) return timestamp.toString()
-
-  const date = new Date(timestamp)
-  return date
+  return new Date(timestamp)
     .toLocaleString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
       hour12: false,
     })
     .replace(',', '')
@@ -44,63 +68,34 @@ const nameColors = [
   'text-rose-500',
 ]
 
-function getNameColor(nick: string): string {
-  return nameColors[Number.parseInt(nick.replaceAll(/[^a-zA-Z0-9]/g, ''), 36) % nameColors.length]
+function computeNameColor(name: string): string {
+  const normalizedName = name.toLowerCase()
+  let hash = 0
+
+  for (let i = 0; i < normalizedName.length; i++) {
+    hash = (hash << 5) - hash + normalizedName.charCodeAt(i)
+    hash = hash & hash
+  }
+
+  return nameColors[Math.abs(hash) % nameColors.length]
 }
 
-export function LogViewer() {
-  const logEvents = useAtomValue(channelEventsAtom)
-  // actual loader
-  const [isLoadingMore, setRequestLoadMore] = useAtom(requestLoadMoreAtom)
+function formatName(name: string): string {
+  return name.length > 18 ? `${name.slice(0, 18)}…` : name.padStart(19)
+}
 
-  const containerRef = useRef<HTMLDivElement>(null)
-  const lastScrollTop = useRef<number>(0)
-
-  // Handle scroll events to detect when user is pulling to refresh
-  const handleScroll = useCallback(() => {
-    if (!containerRef.current) return
-    const { scrollTop } = containerRef.current
-
-    // Only trigger near-top when actively scrolling upward
-    const isScrollingUp = scrollTop < lastScrollTop.current
-
-    // Trigger load when pulled near top
-    if (scrollTop < 10 && isScrollingUp && !isLoadingMore) {
-      setRequestLoadMore(true)
-    }
-
-    lastScrollTop.current = scrollTop
-  }, [isLoadingMore, setRequestLoadMore])
-
+const LogItem = memo(({ name, content, timestamp }: { name: string; content: string; timestamp: number }) => {
   return (
-    <div
-      ref={containerRef}
-      onScroll={handleScroll}
-      className="flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden py-[2lh]"
-    >
-      <LoadingTerminalSpinner />
-
-      <div className="flex flex-col gap-0.5 px-[1ch]">
-        {logEvents
-          ?.sort((a, b) => a.timestamp - b.timestamp)
-          .map((item) => (
-            <div key={item._id} className="flex snap-start">
-              <div className="flex-none font-medium text-muted-foreground">
-                {formatTimestamp(item.timestamp)}
-              </div>
-              <div
-                title={item.name}
-                className={cn(getNameColor(item.name), 'w-[20ch] flex-none truncate text-right font-medium')}
-              >
-                {item.name}
-              </div>
-              <div className="ml-[1ch] overflow-hidden break-words border-l pl-[1ch]">{item.content}</div>
-            </div>
-          ))}
+    <div className="flex snap-start">
+      <div className="flex-none whitespace-pre font-medium text-muted-foreground">
+        {formatTimestamp(timestamp)}
+        <span className={computeNameColor(name)}>{formatName(name)}</span>
       </div>
+      <div className="ml-[1ch] overflow-hidden break-words border-l pl-[1ch]">{content}</div>
     </div>
   )
-}
+})
+LogItem.displayName = 'LogItem'
 
 const LogTopLoader = memo(() => <Loader2Icon className="animate-spin" />)
 LogTopLoader.displayName = 'LogTopLoader'
