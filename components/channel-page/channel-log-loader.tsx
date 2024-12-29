@@ -6,8 +6,8 @@ import { CircleDashedIcon, CircleIcon } from 'lucide-react'
 import { memo, useEffect } from 'react'
 import { channelEventItemsAtom, requestLoadMoreAtom } from './store'
 
-const initialNumItems = 200
-const loadMoreNumItems = 200
+const initialNumItems = 500
+const loadMoreNumItems = 500
 
 export const ChannelLogLoader = memo(({ channel }: { channel: string }) => {
   const { results, isLoading, loadMore } = usePaginatedQuery(

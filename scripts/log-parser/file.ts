@@ -1,8 +1,10 @@
-import { ConvexClient } from 'convex/browser'
-import { api } from '@/convex/_generated/api'
-import { Doc } from '@/convex/_generated/dataModel'
-import { readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { basename, format } from 'node:path'
 import { drop } from 'remeda'
+
+const OUTPUT_DIR = '.logs'
+const OUTPUT_VALUES = true
+const OUTPUT_ENTRIES = false
 
 type LogLine = {
   timestamp: number
@@ -12,14 +14,17 @@ type LogLine = {
   content: string
 }
 
-async function main() {
-  const inputPath = process.argv[2]
-  const logItems = await readLogFile(inputPath)
+export async function parseToLogLines(path: string) {
+  const t = Date.now()
+  const logItems = await readLogFile(path)
 
-  await writeFile(`${inputPath}.jsonl`, logItems.map((item) => JSON.stringify(item)).join('\n'))
-  await writeFile(`${inputPath}.values.jsonl`, logItems.map(serializeToValues).join('\n'))
+  if (OUTPUT_ENTRIES) await writeFile(await getOutputPath(path, '.entries.jsonl'), serializeToJSONL(logItems))
+  if (OUTPUT_VALUES)
+    await writeFile(await getOutputPath(path, '.values.jsonl'), serializeToJSONLValues(logItems))
+
+  console.log('parse', logItems.length, Date.now() - t, 'ms')
+  return logItems
 }
-await main()
 
 async function readLogFile(path: string) {
   const file = await readFile(path, { encoding: 'utf8' })
@@ -39,18 +44,9 @@ function parseLogLine(line: string): LogLine {
     const type = typed.replace(/ed$/, '').replace('left', 'part')
 
     let content = contentArgs.join(' ')
-
-    if (['quit', 'part'].includes(type)) {
-      content = content.slice(1, -1)
-    }
-
-    if (type === 'nick') {
-      content = content.slice(3)
-    }
-
-    if (type === 'topic') {
-      content = content.slice(4, -1)
-    }
+    if (['quit', 'part'].includes(type)) content = content.slice(1, -1)
+    if (type === 'nick') content = content.slice(3)
+    if (type === 'topic') content = content.slice(4, -1)
 
     return {
       timestamp,
@@ -108,6 +104,15 @@ function parseTime(input: string) {
   return date.getTime()
 }
 
-function serializeToValues(logLine: LogLine) {
-  return JSON.stringify([logLine.timestamp, logLine.type, logLine.prefix, logLine.nick, logLine.content])
+function serializeToJSONL(logLines: LogLine[]) {
+  return logLines.map((item) => JSON.stringify(item)).join('\n')
+}
+
+function serializeToJSONLValues(logLines: LogLine[]) {
+  return logLines.map((l) => JSON.stringify([l.timestamp, l.type, l.prefix, l.nick, l.content])).join('\n')
+}
+
+async function getOutputPath(inputPath: string, ext: string) {
+  await mkdir(OUTPUT_DIR, { recursive: true })
+  return format({ dir: OUTPUT_DIR, name: basename(inputPath), ext })
 }

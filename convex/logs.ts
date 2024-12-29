@@ -1,20 +1,31 @@
-import { asyncMap } from 'convex-helpers'
+import { asyncMap, omit } from 'convex-helpers'
 import { paginationOptsValidator } from 'convex/server'
-import { v, type Infer } from 'convex/values'
+import { v } from 'convex/values'
 import type { Doc } from './_generated/dataModel'
 import { mutation, query } from './_generated/server'
 import schema from './schema'
 
-export type LogItem = Doc<'irc_logs'>
-export type AddLogItem = Infer<typeof schema.tables.irc_logs.validator>
+export type LogEntry = Doc<'log_entries'>
 
+const vLogAdd = v.object(omit(schema.tables.log_entries.validator.fields, ['channel']))
 export const add = mutation({
   args: {
-    events: v.array(schema.tables.irc_logs.validator),
+    channel: v.string(),
+    logs: v.array(vLogAdd),
   },
-  handler: async (ctx, { events }) => {
-    await asyncMap(events, async (ev) => await ctx.db.insert('irc_logs', ev))
-    return events.length
+  handler: async (ctx, { channel, logs }) => {
+    const latest = await ctx.db
+      .query('log_entries')
+      .withIndex('channel', (q) => q.eq('channel', channel))
+      .order('desc')
+      .first()
+
+    const latestTimestamp = latest?.timestamp ?? 0
+
+    await asyncMap(logs, async (ev) => {
+      if (ev.timestamp < latestTimestamp) throw new Error('Timestamp is less than latest timestamp')
+      await ctx.db.insert('log_entries', { ...ev, channel })
+    })
   },
 })
 
@@ -24,7 +35,7 @@ export const getLatest = query({
   },
   handler: async (ctx, { channel }) => {
     const result = await ctx.db
-      .query('irc_logs')
+      .query('log_entries')
       .withIndex('channel', (q) => q.eq('channel', channel))
       .order('desc')
       .first()
@@ -39,7 +50,7 @@ export const list = query({
   },
   handler: async (ctx, { channel, limit = 20 }) => {
     const result = await ctx.db
-      .query('irc_logs')
+      .query('log_entries')
       .withIndex('channel', (q) => q.eq('channel', channel))
       .order('desc')
       .take(Math.min(limit, 100))
@@ -54,7 +65,7 @@ export const paginate = query({
   },
   handler: async (ctx, { channel, paginationOpts }) => {
     const result = await ctx.db
-      .query('irc_logs')
+      .query('log_entries')
       .withIndex('channel', (q) => q.eq('channel', channel))
       .order('desc')
       .paginate(paginationOpts)
@@ -69,7 +80,7 @@ export const search = query({
   },
   handler: async (ctx, args) => {
     const result = await ctx.db
-      .query('irc_logs')
+      .query('log_entries')
       .withSearchIndex('messages', (q) =>
         q.search('content', args.value).eq('channel', args.channel).eq('category', 'message'),
       )
