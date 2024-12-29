@@ -5,7 +5,7 @@ import { Doc } from '@/convex/_generated/dataModel'
 import { chunk } from 'remeda'
 import type { WithoutSystemFields } from 'convex/server'
 
-type IRCEvent = WithoutSystemFields<Doc<'events'>>
+type IRCEvent = WithoutSystemFields<Doc<'irc_logs'>>
 
 const convex = new ConvexClient(process.env.NEXT_PUBLIC_CONVEX_URL as string)
 
@@ -29,7 +29,7 @@ async function main() {
 await main()
 
 async function addLines(lines: IRCEvent[]) {
-  const res = await convex.mutation(api.events.add, { events: lines })
+  const res = await convex.mutation(api.logs.add, { events: lines })
   console.log('result:', res)
 }
 
@@ -54,34 +54,34 @@ function parseEvent(line: string) {
       timestamp,
       category: 'status',
       type,
-      name: args[1],
+      nick: args[1],
       content: args.join(' '),
     })
   }
 
   if (args[0] === '*') {
-    const [_, nick, ...content] = args
-    const { name, prefix } = parseNick(nick)
+    const [_, prefixNick, ...content] = args
+    const { nick, prefix } = parseNick(prefixNick)
     return parsed({
       channel,
       timestamp,
       category: 'message',
       type: 'action',
-      name,
+      nick,
       prefix,
       content: content.join(' '),
     })
   }
 
   if (args[0].startsWith('<')) {
-    const [nick, ...content] = args
-    const { name, prefix } = parseNick(nick)
+    const [prefixNick, ...content] = args
+    const { nick, prefix } = parseNick(prefixNick)
     return parsed({
       channel,
       timestamp,
       category: 'message',
       type: 'message',
-      name,
+      nick,
       prefix,
       content: content.join(' '),
     })
@@ -99,9 +99,9 @@ function parseNick(input: string) {
   const prefixNick = input.replaceAll(/[<>]/g, '')
   const prefix = prefixNick.charAt(0)
   if (['@', '%', '+'].includes(prefix)) {
-    return { prefix, name: prefixNick.slice(1) }
+    return { prefix, nick: prefixNick.slice(1) }
   }
-  return { name: prefixNick }
+  return { nick: prefixNick }
 }
 
 function parsed(args: IRCEvent) {

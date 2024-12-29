@@ -1,18 +1,19 @@
 import { asyncMap } from 'convex-helpers'
 import { paginationOptsValidator } from 'convex/server'
-import { v } from 'convex/values'
+import { v, type Infer } from 'convex/values'
 import type { Doc } from './_generated/dataModel'
 import { mutation, query } from './_generated/server'
 import schema from './schema'
 
-export type LogEventItem = Doc<'events'>
+export type LogItem = Doc<'irc_logs'>
+export type AddLogItem = Infer<typeof schema.tables.irc_logs.validator>
 
 export const add = mutation({
   args: {
-    events: v.array(schema.tables.events.validator),
+    events: v.array(schema.tables.irc_logs.validator),
   },
   handler: async (ctx, { events }) => {
-    await asyncMap(events, async (ev) => await ctx.db.insert('events', ev))
+    await asyncMap(events, async (ev) => await ctx.db.insert('irc_logs', ev))
     return events.length
   },
 })
@@ -23,7 +24,7 @@ export const getLatest = query({
   },
   handler: async (ctx, { channel }) => {
     const result = await ctx.db
-      .query('events')
+      .query('irc_logs')
       .withIndex('channel', (q) => q.eq('channel', channel))
       .order('desc')
       .first()
@@ -38,7 +39,7 @@ export const list = query({
   },
   handler: async (ctx, { channel, limit = 20 }) => {
     const result = await ctx.db
-      .query('events')
+      .query('irc_logs')
       .withIndex('channel', (q) => q.eq('channel', channel))
       .order('desc')
       .take(Math.min(limit, 100))
@@ -53,7 +54,7 @@ export const paginate = query({
   },
   handler: async (ctx, { channel, paginationOpts }) => {
     const result = await ctx.db
-      .query('events')
+      .query('irc_logs')
       .withIndex('channel', (q) => q.eq('channel', channel))
       .order('desc')
       .paginate(paginationOpts)
@@ -68,7 +69,7 @@ export const search = query({
   },
   handler: async (ctx, args) => {
     const result = await ctx.db
-      .query('events')
+      .query('irc_logs')
       .withSearchIndex('messages', (q) =>
         q.search('content', args.value).eq('channel', args.channel).eq('category', 'message'),
       )

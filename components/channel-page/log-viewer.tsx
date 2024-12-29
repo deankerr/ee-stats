@@ -41,7 +41,7 @@ export function LogViewer() {
 
       <div className="flex flex-col gap-0.5 px-[1ch]">
         {channelEventItems?.map((item) => (
-          <LogItem key={item._id} name={item.name} content={item.content} timestamp={item.timestamp} />
+          <LogItem key={item._id} name={item.nick} content={item.content} timestamp={item.timestamp} />
         ))}
       </div>
     </div>

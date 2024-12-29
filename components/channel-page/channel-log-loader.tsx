@@ -11,7 +11,7 @@ const loadMoreNumItems = 200
 
 export const ChannelLogLoader = memo(({ channel }: { channel: string }) => {
   const { results, isLoading, loadMore } = usePaginatedQuery(
-    api.events.paginate,
+    api.logs.paginate,
     { channel },
     { initialNumItems },
   )
