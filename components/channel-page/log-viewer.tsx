@@ -1,8 +1,9 @@
 import { useAtomValue, useSetAtom } from 'jotai'
-import { Loader2Icon } from 'lucide-react'
-import { memo, useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
+import { LogEntry } from './log-entry'
 import { channelEventItemsAtom, requestLoadMoreAtom } from './store'
-import { LoadingTerminalSpinner } from './terminal-spinner'
+import { CLILoadingSpinners } from './terminal-spinner'
+import { cn } from '@/lib/utils'
 
 const atTopThreshold = 30
 
@@ -31,79 +32,40 @@ export function LogViewer() {
     }
   }, [channelEventItems])
 
+  if (!channelEventItems?.length) {
+    return (
+      <LogViewerShell className="grid place-content-center p-4">
+        <CLILoadingSpinners spinner="slash" border="double" />
+      </LogViewerShell>
+    )
+  }
+
   return (
     <div
       ref={containerRef}
       onScroll={handleScroll}
       className="flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[0.5lh] pt-[4lh]"
     >
-      <LoadingTerminalSpinner spinners />
+      <CLILoadingSpinners />
 
       <div className="flex flex-col gap-0.5 px-[1ch]">
         {channelEventItems?.map((item) => (
-          <LogItem key={item._id} name={item.nick} content={item.content} timestamp={item.timestamp} />
+          <LogEntry key={item._id} name={item.nick} content={item.content} timestamp={item.timestamp} />
         ))}
       </div>
     </div>
   )
 }
 
-function formatTimestamp(timestamp: number): string {
-  return new Date(timestamp)
-    .toLocaleString('en-CA', {
-      hour12: false,
-    })
-    .replace(',', '')
-}
-
-const nameColors = [
-  'text-red-500',
-  'text-orange-500',
-  'text-amber-500',
-  'text-yellow-500',
-  'text-lime-500',
-  'text-green-500',
-  'text-emerald-500',
-  'text-teal-500',
-  'text-cyan-500',
-  'text-sky-500',
-  'text-blue-500',
-  'text-indigo-500',
-  'text-violet-500',
-  'text-purple-500',
-  'text-fuchsia-500',
-  'text-pink-500',
-  'text-rose-500',
-]
-
-function computeNameColor(name: string): string {
-  const normalizedName = name.toLowerCase()
-  let hash = 0
-
-  for (let i = 0; i < normalizedName.length; i++) {
-    hash = (hash << 5) - hash + normalizedName.charCodeAt(i)
-    hash = hash & hash
-  }
-
-  return nameColors[Math.abs(hash) % nameColors.length]
-}
-
-function formatName(name: string): string {
-  return name.length > 18 ? `${name.slice(0, 18)}…` : name.padStart(19)
-}
-
-const LogItem = memo(({ name, content, timestamp }: { name: string; content: string; timestamp: number }) => {
+function LogViewerShell({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className="flex snap-start">
-      <div className="flex-none whitespace-pre font-medium text-muted-foreground">
-        {formatTimestamp(timestamp)}
-        <span className={computeNameColor(name)}>{formatName(name)}</span>
-      </div>
-      <div className="ml-[1ch] overflow-hidden break-words border-l pl-[1ch]">{content}</div>
+    <div
+      className={cn(
+        'flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[0.5lh] pt-[0.5lh]',
+        className,
+      )}
+    >
+      {children}
     </div>
   )
-})
-LogItem.displayName = 'LogItem'
-
-const LogTopLoader = memo(() => <Loader2Icon className="animate-spin" />)
-LogTopLoader.displayName = 'LogTopLoader'
+}

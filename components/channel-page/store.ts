@@ -1,4 +1,4 @@
-import { LogEntry } from '@/convex/logs'
+import { LogEntry } from '@/convex/types'
 import { atom } from 'jotai'
 
 export const channelEventItemsAtom = atom<LogEntry[]>()

@@ -1,195 +1,41 @@
 import { cn } from '@/lib/utils'
-import { useEffect, useRef, useState } from 'react'
 
-type ProgressIndicatorStyle = {
-  frames: string[]
-  interval: number
-}
+const cliSpinners = {
+  slash: <div className="animate-step-left-4 w-max">—\|/</div>,
+  dots: <div className="animate-step-left-10 w-max">⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏</div>,
+} as const
 
-const styles = {
-  dots1: {
-    frames: ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'],
-    interval: 99,
-  },
-  dots2: {
-    frames: ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'],
-    interval: 99,
-  },
-  dots3: {
-    frames: ['⠋', '⠙', '⠚', '⠞', '⠖', '⠦', '⠴', '⠲', '⠳', '⠓'],
-    interval: 99,
-  },
-  dots4: {
-    frames: ['⠄', '⠆', '⠇', '⠋', '⠙', '⠸', '⠰', '⠠', '⠰', '⠸', '⠙', '⠋', '⠇', '⠆'],
-    interval: 99,
-  },
-  dots5: {
-    frames: ['⠋', '⠙', '⠚', '⠒', '⠂', '⠂', '⠒', '⠲', '⠴', '⠦', '⠖', '⠒', '⠐', '⠐', '⠒', '⠓', '⠋'],
-    interval: 99,
-  },
-  dots6: {
-    frames: [
-      '⠁',
-      '⠉',
-      '⠙',
-      '⠚',
-      '⠒',
-      '⠂',
-      '⠂',
-      '⠒',
-      '⠲',
-      '⠴',
-      '⠤',
-      '⠄',
-      '⠄',
-      '⠤',
-      '⠴',
-      '⠲',
-      '⠒',
-      '⠂',
-      '⠂',
-      '⠒',
-      '⠚',
-      '⠙',
-      '⠉',
-      '⠁',
-    ],
-    interval: 99,
-  },
-  dots7: {
-    frames: [
-      '⠈',
-      '⠉',
-      '⠋',
-      '⠓',
-      '⠒',
-      '⠐',
-      '⠐',
-      '⠒',
-      '⠖',
-      '⠦',
-      '⠤',
-      '⠠',
-      '⠠',
-      '⠤',
-      '⠦',
-      '⠖',
-      '⠒',
-      '⠐',
-      '⠐',
-      '⠒',
-      '⠓',
-      '⠋',
-      '⠉',
-      '⠈',
-    ],
-    interval: 99,
-  },
-  dots8: {
-    frames: [
-      '⠁',
-      '⠁',
-      '⠉',
-      '⠙',
-      '⠚',
-      '⠒',
-      '⠂',
-      '⠂',
-      '⠒',
-      '⠲',
-      '⠴',
-      '⠤',
-      '⠄',
-      '⠄',
-      '⠤',
-      '⠠',
-      '⠠',
-      '⠤',
-      '⠦',
-      '⠖',
-      '⠒',
-      '⠐',
-      '⠐',
-      '⠒',
-      '⠓',
-      '⠋',
-      '⠉',
-      '⠈',
-      '⠈',
-    ],
-    interval: 99,
-  },
-  dots9: {
-    frames: ['⢹', '⢺', '⢼', '⣸', '⣇', '⡧', '⡗', '⡏'],
-    interval: 99,
-  },
-  dots10: {
-    frames: ['⢄', '⢂', '⢁', '⡁', '⡈', '⡐', '⡠'],
-    interval: 99,
-  },
-  dots11: {
-    frames: ['⠁', '⠂', '⠄', '⡀', '⢀', '⠠', '⠐', '⠈'],
-    interval: 99,
-  },
-  old: {
-    frames: ['—', '\\', '|', '/'],
-    interval: 100,
-  },
-} satisfies Record<string, ProgressIndicatorStyle>
-
-const useInterval = (callback: () => void, delay: null | number) => {
-  const savedCallback = useRef(callback)
-
-  useEffect(() => {
-    savedCallback.current = callback
-  }, [callback])
-
-  useEffect(() => {
-    if (delay === null) {
-      return undefined
-    }
-
-    const id = setInterval(() => savedCallback.current(), delay)
-
-    return () => {
-      clearInterval(id)
-    }
-  }, [delay])
-}
-
-export const TerminalSpinner = ({ type }: { type: keyof typeof styles }) => {
-  const { frames, interval } = styles[type]
-
-  const [index, setIndex] = useState<number>(0)
-
-  useInterval(() => {
-    setIndex((index + 1) % frames.length)
-  }, interval)
-
+function CLISpinner({ variant }: { variant: keyof typeof cliSpinners }) {
   return (
-    <span className="pointer-events-none -translate-y-0.5 select-none" aria-hidden>
-      {frames[index]}
-    </span>
+    <div className="pointer-events-none w-2.5 flex-none select-none overflow-hidden text-base" aria-hidden>
+      {cliSpinners[variant]}
+    </div>
   )
 }
 
-export function LoadingTerminalSpinner({
+export function CLILoadingSpinners({
   className,
-  spinners = true,
+  spinner = 'slash',
+  border = 'default',
 }: {
   className?: string
-  spinners?: boolean
+  spinner?: 'slash' | 'dots'
+  border?: 'default' | 'double' | 'strong'
 }) {
   return (
     <div
       className={cn(
-        'mx-auto w-fit whitespace-pre border border-primary px-[1ch] text-center text-primary',
+        'flex h-fit w-fit items-center justify-between gap-[3ch] border border-primary px-[1ch] py-px text-primary',
+        border === 'double' && 'border-4 border-double py-0.5',
+        border === 'strong' && 'border-[3px] py-0.5',
         className,
       )}
     >
-      {spinners && <TerminalSpinner type="old" />}
-      {'   LOADING   '}
-      {spinners && <TerminalSpinner type="old" />}
+      <CLISpinner variant={spinner} />
+      LOADING
+      <CLISpinner variant={spinner} />
     </div>
   )
 }
+
+// className={cn('mx-auto w-fit whitespace-pre border border-primary px-3 py-1 text-primary', className)}
