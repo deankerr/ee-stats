@@ -1,5 +1,5 @@
 import { asyncMap, omit } from 'convex-helpers'
-import { v } from 'convex/values'
+import { ConvexError, v } from 'convex/values'
 import { mutation } from './_generated/server'
 import schema from './schema'
 
@@ -19,8 +19,8 @@ export const add = mutation({
       .order('desc')
       .first()
 
-    if (latest && firstArgLog.timestamp > latest.timestamp - 1) {
-      throw new Error('log start is before current latest')
+    if (latest && firstArgLog.timestamp < latest.timestamp - 1) {
+      throw new ConvexError({ message: 'log start is before current latest', entry: latest })
     }
 
     await asyncMap(logs, async (ev) => {

@@ -1,19 +1,43 @@
 import { memo } from 'react'
 
-export const LogEntry = memo(
-  ({ name, content, timestamp }: { name: string; content: string; timestamp: number }) => {
+export const LogEntryLine = memo(
+  ({
+    type,
+    name,
+    content,
+    timestamp,
+    ...props
+  }: {
+    type: string
+    name: string
+    content: string
+    timestamp: number
+  } & React.ComponentPropsWithRef<'div'>) => {
     return (
-      <div className="flex snap-start">
+      <div className="flex" {...props}>
         <div className="flex-none whitespace-pre font-medium text-muted-foreground">
           {formatTimestamp(timestamp)}
           <span className={computeNameColor(name)}>{formatName(name)}</span>
         </div>
-        <div className="ml-[1ch] overflow-hidden break-words border-l pl-[1ch]">{content}</div>
+        <div className="ml-[1ch] overflow-hidden break-words border-l pl-[1ch]">
+          {formatContent(type, content)}
+        </div>
       </div>
     )
   },
 )
-LogEntry.displayName = 'LogItem'
+LogEntryLine.displayName = 'LogItem'
+
+function formatContent(type: string, content: string) {
+  switch (type) {
+    case 'join':
+      return 'joined the channel'
+    case 'part':
+      return `left the channel (${content})`
+    default:
+      return content
+  }
+}
 
 function formatTimestamp(timestamp: number): string {
   return new Date(timestamp)

@@ -1,69 +1,101 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useEffect, useRef } from 'react'
-import { LogEntry } from './log-entry'
 import { channelEventItemsAtom, requestLoadMoreAtom } from './store'
-import { CLILoadingSpinners } from './terminal-spinner'
+import { CLILoadingSpinner } from './cli-spinner'
 import { cn } from '@/lib/utils'
+import type { LogEntry } from '@/convex/types'
+import { LogEntryLine } from './log-entry-line'
+import { useChannelLog } from './use-channel-log'
+import { Button } from '../ui/button'
 
 const atTopThreshold = 30
 
-export function LogViewer() {
-  const channelEventItems = useAtomValue(channelEventItemsAtom)
-  const setRequestLoadMore = useSetAtom(requestLoadMoreAtom)
+export function LogViewContainer({ channel }: { channel: string }) {
+  const channelQuery = useChannelLog(channel)
+
+  if (channelQuery.status === 'LoadingFirstPage') {
+    return (
+      <LogViewerShell className="grid place-content-center p-4">
+        <CLILoadingSpinner spinner="slash" border="double" />
+      </LogViewerShell>
+    )
+  }
+
+  if (channelQuery.status === 'Exhausted' && !channelQuery.results.length) {
+    return (
+      <LogViewerShell className="grid place-content-center p-4">
+        <div>No results</div>
+      </LogViewerShell>
+    )
+  }
+
+  const LoadMoreButton = (
+    <Button size="lg" onClick={() => channelQuery.loadNext()} style={{ overflowAnchor: 'none' }}>
+      Load More
+    </Button>
+  )
+
+  return <LogViewer logEntries={channelQuery.results} btn={LoadMoreButton} />
+}
+
+export function LogViewer({ logEntries, btn }: { logEntries: LogEntry[]; btn: React.JSX.Element }) {
+  // const setRequestLoadMore = useSetAtom(requestLoadMoreAtom)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const lastScrollTop = useRef<number>(0)
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return
+
     const isScrollingUp = containerRef.current.scrollTop < lastScrollTop.current
-    if (containerRef.current.scrollTop < atTopThreshold && isScrollingUp) {
-      setRequestLoadMore(true)
-    }
+    const isWithinThreshold = containerRef.current.scrollTop < atTopThreshold
+    // if (isWithinThreshold && isScrollingUp) setRequestLoadMore(true)
 
     lastScrollTop.current = containerRef.current.scrollTop
-  }, [setRequestLoadMore])
+  }, [])
 
   const initialScrollToEnd = useRef(false)
   useEffect(() => {
-    if (containerRef.current && !initialScrollToEnd.current && channelEventItems?.length) {
+    if (containerRef.current && !initialScrollToEnd.current && logEntries?.length) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight
       initialScrollToEnd.current = true
     }
-  }, [channelEventItems])
-
-  if (!channelEventItems?.length) {
-    return (
-      <LogViewerShell className="grid place-content-center p-4">
-        <CLILoadingSpinners spinner="slash" border="double" />
-      </LogViewerShell>
-    )
-  }
+  }, [logEntries])
 
   return (
-    <div
-      ref={containerRef}
-      onScroll={handleScroll}
-      className="flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[0.5lh] pt-[4lh]"
-    >
-      <CLILoadingSpinners />
+    <LogViewerShell ref={containerRef} onScroll={handleScroll} className="">
+      {/* <CLILoadingSpinner /> */}
+      {btn}
 
-      <div className="flex flex-col gap-0.5 px-[1ch]">
-        {channelEventItems?.map((item) => (
-          <LogEntry key={item._id} name={item.nick} content={item.content} timestamp={item.timestamp} />
-        ))}
+      {logEntries.toReversed().map((item) => (
+        <LogEntryLine
+          key={item._id}
+          type={item.type}
+          name={item.nick}
+          content={item.content}
+          timestamp={item.timestamp}
+        />
+      ))}
+      <div
+        className="h-8 bg-muted text-center text-xs text-muted-foreground"
+        style={{ overflowAnchor: 'auto' }}
+      >
+        the bottom
       </div>
-    </div>
+    </LogViewerShell>
   )
 }
 
-function LogViewerShell({ children, className }: { children: React.ReactNode; className?: string }) {
+function LogViewerShell({
+  children,
+  className,
+  ...props
+}: { children: React.ReactNode; className?: string } & React.ComponentPropsWithRef<'div'>) {
   return (
     <div
-      className={cn(
-        'flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden pb-[0.5lh] pt-[0.5lh]',
-        className,
-      )}
+      className={cn('flex-1 overflow-y-auto overflow-x-hidden', className)}
+      style={{ overflowAnchor: 'none' }}
+      {...props}
     >
       {children}
     </div>

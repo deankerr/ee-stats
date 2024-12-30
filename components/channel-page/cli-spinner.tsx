@@ -1,8 +1,8 @@
 import { cn } from '@/lib/utils'
 
 const cliSpinners = {
-  slash: <div className="animate-step-left-4 w-max">—\|/</div>,
-  dots: <div className="animate-step-left-10 w-max">⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏</div>,
+  slash: <div className="w-max animate-step-left-4">—\|/</div>,
+  dots: <div className="w-max animate-step-left-10">⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏</div>,
 } as const
 
 function CLISpinner({ variant }: { variant: keyof typeof cliSpinners }) {
@@ -13,15 +13,16 @@ function CLISpinner({ variant }: { variant: keyof typeof cliSpinners }) {
   )
 }
 
-export function CLILoadingSpinners({
-  className,
+export function CLILoadingSpinner({
   spinner = 'slash',
   border = 'default',
+  className,
+  children,
+  ...props
 }: {
-  className?: string
   spinner?: 'slash' | 'dots'
   border?: 'default' | 'double' | 'strong'
-}) {
+} & React.ComponentPropsWithRef<'div'>) {
   return (
     <div
       className={cn(
@@ -30,12 +31,11 @@ export function CLILoadingSpinners({
         border === 'strong' && 'border-[3px] py-0.5',
         className,
       )}
+      {...props}
     >
       <CLISpinner variant={spinner} />
-      LOADING
+      {children ?? 'LOADING'}
       <CLISpinner variant={spinner} />
     </div>
   )
 }
-
-// className={cn('mx-auto w-fit whitespace-pre border border-primary px-3 py-1 text-primary', className)}
