@@ -1,8 +1,10 @@
 'use client'
 
+import { useConvex } from 'convex/react'
 import { ThemeSwitcher } from '../theme-switcher'
 import { LogsBrowser } from './logs-browser'
 import { SearchInput } from './search-input'
+import { useEffect, useState } from 'react'
 
 export function ChannelPage({ channel }: { channel: string }) {
   // const [search] = useQueryState('search')
@@ -28,8 +30,16 @@ function ChannelHeader({ channel }: { channel: string }) {
       </div>
       <div className="flex w-1/3 items-center justify-end gap-1">
         {/* <ChannelLogLoader channel={channel} /> */}
+        <ConvexSpy />
         <ThemeSwitcher />
       </div>
     </header>
   )
+}
+
+function ConvexSpy() {
+  const [count, setCount] = useState(0)
+  const cvx = useConvex()
+  useEffect(() => console.log(cvx))
+  return <div onClick={() => setCount((p) => p + 1)}>C{count}</div>
 }
