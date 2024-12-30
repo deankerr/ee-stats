@@ -1,7 +1,7 @@
-import type { LogEntry } from '@/convex/logs'
-import type { WithoutSystemFields } from 'convex/server'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { format } from 'node:path'
+import type { LogEntry } from '@/convex/types'
+import type { WithoutSystemFields } from 'convex/server'
 import { drop } from 'remeda'
 
 const OUTPUT_DIR = '.logs'

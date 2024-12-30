@@ -1,12 +1,10 @@
-import { useAtomValue, useSetAtom } from 'jotai'
-import { useCallback, useEffect, useRef } from 'react'
-import { channelEventItemsAtom, requestLoadMoreAtom } from './store'
-import { CLILoadingSpinner } from './cli-spinner'
-import { cn } from '@/lib/utils'
 import type { LogEntry } from '@/convex/types'
+import { cn } from '@/lib/utils'
+import { useCallback, useEffect, useRef } from 'react'
+import { Button } from '../ui/button'
+import { CLILoadingSpinner } from './cli-spinner'
 import { LogEntryLine } from './log-entry-line'
 import { useChannelLog } from './use-channel-log'
-import { Button } from '../ui/button'
 
 const atTopThreshold = 30
 
