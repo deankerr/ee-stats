@@ -29,7 +29,10 @@ export const ChannelLogLoader = memo(({ channel }: { channel: string }) => {
   }, [loadMore, requestLoadMore, setRequestLoadMore, isLoading])
 
   return (
-    <div className={cn('stack flex-none')} onClick={() => loadMore(loadMoreNumItems)}>
+    <div
+      className={cn('stack flex-none place-content-center place-items-center')}
+      onClick={() => loadMore(loadMoreNumItems)}
+    >
       <Indicator n={results.length} isLoading={isLoading} />
     </div>
   )

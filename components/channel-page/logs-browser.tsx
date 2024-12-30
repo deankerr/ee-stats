@@ -52,7 +52,7 @@ export function LogsBrowser({ channel }: { channel: string }) {
       {/* scroll container */}
       <div
         className={cn(
-          'relative flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden px-[1ch] [&>*]:snap-start',
+          'snap-y snap-mandatory overflow-y-auto overflow-x-hidden px-[1ch] text-sm [&>*]:snap-start',
         )}
         style={{
           scrollbarGutter: 'stable',
@@ -79,16 +79,17 @@ export function LogsBrowser({ channel }: { channel: string }) {
             name={item.nick}
             content={item.content}
             timestamp={item.timestamp}
+            className="flex py-0.5"
           />
         ))}
       </div>
 
-      <div className={cn('flex h-8 flex-none items-center border-t bg-background px-2 text-sm')}>
+      <div className={cn('flex h-6 flex-none items-center self-end border-t bg-background px-2 text-sm')}>
         {status} {results.length}
       </div>
 
       {/* button panel */}
-      <div className="fixed left-1 top-12 z-40 space-x-2 px-1">
+      <div className="fixed left-1 top-12 space-x-2 px-1">
         <Button
           size="icon"
           variant="outline"

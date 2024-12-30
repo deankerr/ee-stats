@@ -18,7 +18,7 @@ export function SearchInput({ className }: { className?: string }) {
       } else {
         setSearch(inputValue)
       }
-    }, 300) // 300ms debounce
+    }, 300)
 
     return () => clearTimeout(timer)
   }, [inputValue, setSearch])
