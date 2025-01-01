@@ -5,7 +5,7 @@ import type { WithoutSystemFields } from 'convex/server'
 import { drop } from 'remeda'
 
 const OUTPUT_DIR = '.logs'
-const OUTPUT_VALUES = false
+const OUTPUT_VALUES = true
 const OUTPUT_ENTRIES = true
 
 type LogEntryFields = WithoutSystemFields<LogEntry>
@@ -126,5 +126,7 @@ function serializeToJSONLValues(logLines: LogEntryFields[]) {
 
 async function getOutputPath(outputFilename: string) {
   await mkdir(OUTPUT_DIR, { recursive: true })
-  return format({ dir: OUTPUT_DIR, base: outputFilename })
+  const path = format({ dir: OUTPUT_DIR, base: outputFilename })
+  console.log('path:', path)
+  return path
 }

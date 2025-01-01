@@ -1,7 +1,6 @@
 'use client'
 
-import { useConvex } from 'convex/react'
-import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { ThemeSwitcher } from '../theme-switcher'
 import { LogsBrowser } from './logs-browser'
 import { SearchInput } from './search-input'
@@ -21,11 +20,9 @@ export function ChannelPage({ channel }: { channel: string }) {
 
 function ChannelHeader({ channel }: { channel: string }) {
   return (
-    <header className="grid flex-none grid-cols-3 items-center border-b bg-background px-2 py-1 shadow">
+    <header className="grid flex-none grid-cols-3 items-center border-b bg-background px-2 py-1 text-15 font-[450] shadow">
       <div className="flex items-center gap-2 px-2">
-        <h1 className="text-lg">
-          {'ee'} #{channel}
-        </h1>
+        <h1>ee #{channel} feed</h1>
       </div>
 
       <div className="">
@@ -33,16 +30,11 @@ function ChannelHeader({ channel }: { channel: string }) {
       </div>
 
       <div className="flex items-center justify-end gap-1">
-        <ConvexSpy />
+        <Link href={`/channel/${channel}/stats`} className="px-1 underline underline-offset-2">
+          stats
+        </Link>
         <ThemeSwitcher />
       </div>
     </header>
   )
-}
-
-function ConvexSpy() {
-  const [count, setCount] = useState(0)
-  const cvx = useConvex()
-  useEffect(() => console.log(cvx))
-  return <div onClick={() => setCount((p) => p + 1)}>C{count}</div>
 }
