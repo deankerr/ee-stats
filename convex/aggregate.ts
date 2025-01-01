@@ -1,11 +1,9 @@
 import { TableAggregate } from '@convex-dev/aggregate'
 import { Migrations } from '@convex-dev/migrations'
-import { asyncMap } from 'convex-helpers'
 import { v } from 'convex/values'
 import { components, internal } from './_generated/api'
 import { DataModel, type Id } from './_generated/dataModel'
 import { internalMutation, query, type MutationCtx } from './_generated/server'
-import { EVENT_NAMES } from './constants'
 
 export const aggNickActivity = new TableAggregate<{
   Namespace: string
@@ -36,32 +34,36 @@ export const aggsOnInsert = async (ctx: MutationCtx, id: Id<'log_entries'>) => {
 
 export const getAggs = query({
   args: {
-    channel: v.string(),
+    dayOf: v.optional(v.number()),
   },
-  handler: async (ctx, { channel }) => {
-    const namespace = channel
-    const total = await aggNickActivity.count(ctx, { namespace, bounds: {} })
+  handler: async (ctx, { dayOf = 1735748736342 }) => {
+    const lower = new Date(dayOf)
+    lower.setUTCHours(0, 0, 0, 0)
 
-    const users = await ctx.db
-      .query('log_users')
-      .withIndex('channel', (q) => q.eq('channel', channel))
-      .collect()
+    const upper = new Date(lower)
+    upper.setUTCDate(upper.getUTCDate() + 1)
 
-    return {
-      _total: total,
-      nicks: await asyncMap(users, async ({ nick }) => {
-        return {
-          _nick: nick,
-          _total: await aggNickActivity.count(ctx, { namespace, bounds: { prefix: [nick] } }),
-          events: await asyncMap(EVENT_NAMES, async (event) => {
-            return {
-              event,
-              count: await aggNickActivity.count(ctx, { namespace, bounds: { prefix: [nick, event] } }),
-            }
-          }).then((events) => events.filter((ev) => ev.count)),
-        }
-      }),
+    console.log('bounds', upper, lower)
+
+    const totals: [string, number][] = []
+    for await (const namespace of aggNSNickTimestamp.iterNamespaces(ctx)) {
+      const total = await aggNSNickTimestamp.count(ctx, {
+        namespace,
+        bounds: {
+          upper: {
+            key: upper.getTime(),
+            inclusive: false,
+          },
+          lower: {
+            key: lower.getTime(),
+            inclusive: true,
+          },
+        },
+      })
+      totals.push([namespace, total])
     }
+
+    return totals
   },
 })
 

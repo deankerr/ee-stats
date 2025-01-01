@@ -1,7 +1,6 @@
 'use client'
 
 import { api } from '@/convex/_generated/api'
-import { EVENT_NAMES } from '@/convex/constants'
 import { useQuery } from 'convex/react'
 import { PageHeader } from '../page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
@@ -42,28 +41,26 @@ function ActivityTable({ channel }: { channel: string }) {
   const data = useActivityData(channel)
   if (!data) return <div>loading...</div>
 
-  const { nicks } = data
+  const { nicks, total } = data
 
   return (
     <div>
-      <Table className="mx-auto max-w-4xl rounded border">
+      <Table className="mx-auto max-w-sm rounded border">
         <TableHeader>
           <TableRow>
             <TableHead>Nick</TableHead>
-            <TableHead>Total</TableHead>
-            {EVENT_NAMES.map((event) => (
-              <TableHead key={event}>{event}</TableHead>
-            ))}
+            <TableHead className="text-right">Total</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
+          <TableRow className="font-semibold">
+            <TableCell>Total</TableCell>
+            <TableCell className="text-right">{total}</TableCell>
+          </TableRow>
           {nicks.map((nick) => (
             <TableRow key={nick.nick}>
               <TableCell>{nick.nick}</TableCell>
-              <TableCell>{nick.total}</TableCell>
-              {EVENT_NAMES.map((event) => (
-                <TableCell key={event}>{nick.events.find((ev) => ev.event === event)?.count}</TableCell>
-              ))}
+              <TableCell className="text-right">{nick.total}</TableCell>
             </TableRow>
           ))}
         </TableBody>

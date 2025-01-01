@@ -3,8 +3,7 @@ import { paginationOptsValidator } from 'convex/server'
 import { v } from 'convex/values'
 import type { Doc } from './_generated/dataModel'
 import { query } from './_generated/server'
-import { aggNickActivity } from './aggregate'
-import { EVENT_NAMES } from './constants'
+import { aggNickActivity, aggNSNickTimestamp } from './aggregate'
 import { getDistinctNicksForChannel } from './helpers'
 import type { LogEntry } from './types'
 
@@ -86,18 +85,13 @@ export const activity = query({
 
     const result = {
       total,
-      nicks: await asyncMap(users, async ({ nick }) => {
-        return {
-          nick: nick,
-          total: await aggNickActivity.count(ctx, { namespace, bounds: { prefix: [nick] } }),
-          events: await asyncMap(EVENT_NAMES, async (event) => {
-            return {
-              event,
-              count: await aggNickActivity.count(ctx, { namespace, bounds: { prefix: [nick, event] } }),
-            }
-          }).then((events) => events.filter((ev) => ev.count)),
-        }
-      }),
+      nicks: await asyncMap(users, async ({ nick }) => ({
+        nick,
+        total: await aggNSNickTimestamp.count(ctx, {
+          namespace: nick,
+          bounds: {},
+        }),
+      })),
     }
 
     result.nicks.sort((a, b) => b.total - a.total)
