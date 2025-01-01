@@ -3,8 +3,7 @@
 import { api } from '@/convex/_generated/api'
 import { EVENT_NAMES } from '@/convex/constants'
 import { useQuery } from 'convex/react'
-import Link from 'next/link'
-import { ThemeSwitcher } from '../theme-switcher'
+import { PageHeader } from '../page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { BarChart1 } from './bar-chart'
@@ -18,8 +17,8 @@ const useActivityData = (channel: string) => {
 export function StatsPage({ channel }: { channel: string }) {
   return (
     <div className="flex flex-col">
-      <Header channel={channel} />
-      <Tabs defaultValue="activity" className="p-4">
+      <PageHeader channel={channel} page="stats" />
+      <Tabs defaultValue="activity" className="p-2">
         <TabsList>
           <TabsTrigger value="activity">Activity</TabsTrigger>
           <TabsTrigger value="charts1">Charts 1</TabsTrigger>
@@ -36,25 +35,6 @@ export function StatsPage({ channel }: { channel: string }) {
         </TabsContent>
       </Tabs>
     </div>
-  )
-}
-
-function Header({ channel }: { channel: string }) {
-  return (
-    <header className="sticky top-0 z-10 grid flex-none grid-cols-3 items-center border-b bg-background px-2 py-1 text-15 font-[450] shadow">
-      <div className="flex items-center gap-2 px-2">
-        <h1>ee #{channel} stats</h1>
-      </div>
-
-      <div className="">{/* <SearchInput className="w-full" /> */}</div>
-
-      <div className="flex items-center justify-end gap-1">
-        <Link href={`/channel/${channel}`} className="px-1 underline underline-offset-2">
-          feed
-        </Link>
-        <ThemeSwitcher />
-      </div>
-    </header>
   )
 }
 

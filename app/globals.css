@@ -85,6 +85,10 @@
 }
 
 @layer components {
+  .link {
+    @apply underline decoration-from-font underline-offset-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
+  }
+
   .skeleton-lines {
     background-image: linear-gradient(hsl(var(--primary) / 0.1) 1lh, transparent 1lh);
     background-size: 100% calc(1lh + 2px); /* Line height + gap */

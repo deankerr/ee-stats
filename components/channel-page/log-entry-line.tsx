@@ -68,7 +68,7 @@ function linkifyContent(text: string): React.ReactNode {
         href={match[0]}
         target="_blank"
         rel="noopener noreferrer"
-        className="underline underline-offset-2"
+        className="link"
         onClick={(e) => e.stopPropagation()}
       >
         {match[0]}
