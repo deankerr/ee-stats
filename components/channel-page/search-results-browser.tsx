@@ -35,7 +35,7 @@ export function SearchResultsBrowser({ channel }: { channel: string }) {
           name={item.nick}
           content={item.content}
           timestamp={item.timestamp}
-          className="flex py-1.5"
+          className="flex py-2 hover:bg-muted/50"
         />
       ))}
 

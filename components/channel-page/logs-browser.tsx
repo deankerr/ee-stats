@@ -2,14 +2,15 @@ import { api } from '@/convex/_generated/api'
 import { cn } from '@/lib/utils'
 import { useInfiniteScroll } from '@reactuses/core'
 import { usePaginatedQuery } from 'convex/react'
-import { ArrowDownIcon, ArrowUpIcon, RefreshCcwIcon } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { ArrowDownIcon } from 'lucide-react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Button } from '../ui/button'
 import { CLILoadingSpinner } from './cli-spinner'
 import { LogEntryLine } from './log-entry-line'
 
 const containerPaddingTop = 20
 const atTopThreshold = 60
+const atEndThreshold = 30
 
 const initialNumItems = 200
 const loadMoreNumItems = 200
@@ -17,35 +18,42 @@ const loadMoreNumItems = 200
 export function LogsBrowser({ channel }: { channel: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const { results, isLoading, loadMore, status } = usePaginatedQuery(
-    api.queries.paginate,
-    { channel },
-    { initialNumItems },
-  )
+  const getIsAtEnd = useCallback(() => {
+    if (!containerRef.current) return false
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current
+    return scrollTop >= scrollHeight - clientHeight - atEndThreshold
+  }, [])
 
-  useInfiniteScroll(
-    containerRef,
-    () => {
-      if (!containerRef.current) return
-      console.log('load more')
-      loadMore(loadMoreNumItems)
-    },
-    {
-      direction: 'top',
-      distance: atTopThreshold,
-    },
-  )
+  const isAtEnd = getIsAtEnd()
 
-  const initialScrollToEnd = useRef(false)
-  useEffect(() => {
-    if (initialScrollToEnd.current) return
+  const scrollToLatest = useCallback((behavior: 'smooth' | 'auto' = 'smooth') => {
     const latestLogEl = document.getElementById('ee-log-entry-1')
-    if (latestLogEl) {
-      latestLogEl.scrollIntoView()
-      initialScrollToEnd.current = true
-      console.log('first to end')
+    if (latestLogEl) latestLogEl.scrollIntoView({ behavior })
+  }, [])
+
+  const {
+    results,
+    isLoading,
+    loadMore: loadMoreQuery,
+    status,
+  } = usePaginatedQuery(api.queries.paginate, { channel }, { initialNumItems })
+
+  const loadMore = useCallback(() => {
+    loadMoreQuery(loadMoreNumItems)
+  }, [loadMoreQuery])
+
+  useInfiniteScroll(containerRef, loadMore, {
+    direction: 'top',
+    distance: atTopThreshold,
+  })
+
+  const initialScrollToLatest = useRef(false)
+  useEffect(() => {
+    if (results.length && (getIsAtEnd() || !initialScrollToLatest.current)) {
+      scrollToLatest('auto')
+      initialScrollToLatest.current = true
     }
-  }, [status])
+  }, [results.length, getIsAtEnd, scrollToLatest])
 
   return (
     <>
@@ -53,7 +61,7 @@ export function LogsBrowser({ channel }: { channel: string }) {
         {/* scroll container */}
         <div
           className={cn(
-            'flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden px-[1ch] text-base leading-relaxed [&>*]:snap-start',
+            'text-15 flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden px-[1ch] leading-relaxed',
           )}
           style={{
             scrollbarGutter: 'stable',
@@ -80,43 +88,24 @@ export function LogsBrowser({ channel }: { channel: string }) {
               name={item.nick}
               content={item.content}
               timestamp={item.timestamp}
-              className="flex py-0.5 hover:bg-muted/50"
+              className={cn(
+                'flex snap-start py-0.5 hover:bg-muted/50',
+                i + 1 === results.length && 'snap-end',
+              )}
             />
           ))}
         </div>
 
         <div className={cn('flex h-6 flex-none items-center border-t bg-background px-2 text-xs')}>
-          {status} {results.length}
+          {!isAtEnd && (
+            <div className="absolute bottom-16 right-16">
+              <Button size="icon" variant="outline" onClick={() => scrollToLatest('smooth')}>
+                <ArrowDownIcon className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          {status} {results.length} {isAtEnd ? 'at end' : 'not at end'}
         </div>
-      </div>
-
-      {/* button panel */}
-      <div className="fixed left-1 top-12 space-x-2 px-1">
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={() => {
-            const firstLogEl = document.getElementById(`ee-log-entry-${results.length}`)
-            if (firstLogEl) firstLogEl.scrollIntoView({ behavior: 'smooth' })
-          }}
-        >
-          <ArrowUpIcon className="h-4 w-4" />
-        </Button>
-
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={() => {
-            const latestLogEl = document.getElementById('ee-log-entry-1')
-            if (latestLogEl) latestLogEl.scrollIntoView({ behavior: 'smooth' })
-          }}
-        >
-          <ArrowDownIcon className="h-4 w-4" />
-        </Button>
-
-        <Button size="icon" variant="outline" onClick={() => loadMore(loadMoreNumItems)}>
-          <RefreshCcwIcon className="h-4 w-4" />
-        </Button>
       </div>
     </>
   )

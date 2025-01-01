@@ -22,7 +22,12 @@ export const LogEntryLine = memo(
           {formatTimestamp(timestamp)}
           <span className={nickColor}>{formatName(name)}</span>
         </div>
-        <div className={cn('ml-[1ch] overflow-hidden break-words border-l pl-[1ch]', contentColor)}>
+        <div
+          className={cn(
+            'ml-[1ch] overflow-hidden break-words border-l pl-[1ch] sm:whitespace-pre-wrap',
+            contentColor,
+          )}
+        >
           {formatContent(type, content)}
         </div>
       </div>
