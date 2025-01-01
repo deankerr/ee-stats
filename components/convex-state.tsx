@@ -1,11 +1,10 @@
 'use client'
 
 import { useConvex } from 'convex/react'
-import { useEffect, useState } from 'react'
+import { memo } from 'react'
 
-export function ConvexState() {
-  const [_, setCount] = useState(0)
+export const ConvexState = memo(() => {
   const cvx = useConvex()
-  useEffect(() => console.log(cvx))
-  return <div onClick={() => setCount((p) => p + 1)}>C</div>
-}
+  return <div onClick={() => console.log(cvx)}>C</div>
+})
+ConvexState.displayName = 'ConvexState'

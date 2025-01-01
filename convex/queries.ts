@@ -1,10 +1,19 @@
-import { asyncMap } from 'convex-helpers'
+import { asyncMap, omit } from 'convex-helpers'
 import { paginationOptsValidator } from 'convex/server'
 import { v } from 'convex/values'
+import type { Doc } from './_generated/dataModel'
 import { query } from './_generated/server'
 import { aggNickActivity } from './aggregate'
 import { EVENT_NAMES } from './constants'
 import { getDistinctNicksForChannel } from './helpers'
+import type { LogEntry } from './types'
+
+function transformLogEntry(logEntry: Doc<'log_entries'>): LogEntry {
+  return {
+    ...omit(logEntry, ['_id', '_creationTime', 'category', 'channel']),
+    id: logEntry._id,
+  }
+}
 
 export const list = query({
   args: {
@@ -17,7 +26,7 @@ export const list = query({
       .withIndex('channel', (q) => q.eq('channel', channel))
       .order('desc')
       .take(Math.min(limit, 100))
-    return result.reverse()
+    return result.reverse().map(transformLogEntry)
   },
 })
 
@@ -32,7 +41,7 @@ export const paginate = query({
       .withIndex('channel', (q) => q.eq('channel', channel))
       .order('desc')
       .paginate(paginationOpts)
-    return result
+    return { ...result, page: result.page.map(transformLogEntry) }
   },
 })
 
@@ -49,7 +58,7 @@ export const search = query({
       )
       .take(50)
 
-    return result
+    return result.map(transformLogEntry)
   },
 })
 

@@ -15,7 +15,7 @@ export function SearchResultsBrowser({ channel }: { channel: string }) {
   return (
     <div
       className={cn(
-        'text-15 relative divide-y overflow-y-auto overflow-x-hidden bg-background px-[1ch] pb-2',
+        'relative divide-y overflow-y-auto overflow-x-hidden bg-background px-[1ch] pb-2 text-15',
       )}
       style={{
         scrollbarGutter: 'stable',
@@ -30,7 +30,7 @@ export function SearchResultsBrowser({ channel }: { channel: string }) {
       {results?.map((item, i) => (
         <LogEntryLine
           id={`ee-log-entry-${results.length - i}`}
-          key={item._id}
+          key={item.id}
           type={item.type}
           name={item.nick}
           content={item.content}
