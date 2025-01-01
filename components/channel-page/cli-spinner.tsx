@@ -1,11 +1,17 @@
 import { cn } from '@/lib/utils'
 
 const cliSpinners = {
+  none: null,
   slash: <div className="w-max animate-step-left-4 group-aria-hidden:animate-none">—\|/</div>,
   dots: <div className="w-max animate-step-left-10 group-aria-hidden:animate-none">⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏</div>,
 } as const
 
 function CLISpinner({ variant }: { variant: keyof typeof cliSpinners }) {
+  if (variant === 'none') {
+    return (
+      <div className="pointer-events-none w-0 flex-none select-none overflow-hidden text-base" aria-hidden />
+    )
+  }
   return (
     <div className="pointer-events-none w-2.5 flex-none select-none overflow-hidden text-base" aria-hidden>
       {cliSpinners[variant]}
@@ -21,7 +27,7 @@ export function CLILoadingSpinner({
   children,
   ...props
 }: {
-  spinner?: 'slash' | 'dots'
+  spinner?: 'slash' | 'dots' | 'none'
   border?: 'default' | 'double' | 'strong'
   enabled?: boolean
 } & React.ComponentPropsWithRef<'div'>) {

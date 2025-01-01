@@ -15,12 +15,18 @@ export function SearchResultsBrowser({ channel }: { channel: string }) {
   return (
     <div
       className={cn(
-        'relative divide-y overflow-y-auto overflow-x-hidden bg-background px-[1ch] pb-2 text-sm',
+        'text-15 relative divide-y overflow-y-auto overflow-x-hidden bg-background px-[1ch] pb-2',
       )}
       style={{
         scrollbarGutter: 'stable',
       }}
     >
+      {!results && (
+        <div className="stack h-full place-content-center">
+          <CLILoadingSpinner className="-translate-y-1/2" border="double" />
+        </div>
+      )}
+
       {results?.map((item, i) => (
         <LogEntryLine
           id={`ee-log-entry-${results.length - i}`}
@@ -34,10 +40,12 @@ export function SearchResultsBrowser({ channel }: { channel: string }) {
       ))}
 
       {results?.length === 0 && (
-        <div className="relative top-1/3 text-center text-muted-foreground">No results.</div>
+        <div className="stack h-full place-content-center">
+          <CLILoadingSpinner className="-translate-y-1/2" border="double" spinner="none">
+            NO RESULTS
+          </CLILoadingSpinner>
+        </div>
       )}
-
-      {!results && <CLILoadingSpinner className="top-1/3" border="double" enabled={true} />}
     </div>
   )
 }

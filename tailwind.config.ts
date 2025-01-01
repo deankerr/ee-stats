@@ -15,6 +15,18 @@ export default {
         sans: ['var(--font-geist-sans)', ...fontFamily.sans],
         mono: ['var(--font-geist-mono)', ...fontFamily.mono],
       },
+      fontSize: {
+        '11': ['0.6875rem', { lineHeight: '1rem' }],
+        '13': ['0.8125rem', { lineHeight: '1.125rem' }],
+        '15': ['0.9375rem', { lineHeight: '1.375rem' }],
+        '17': ['1.0625rem', { lineHeight: '1.5rem' }],
+        '19': ['1.1875rem', { lineHeight: '1.75rem' }],
+        '21': ['1.3125rem', { lineHeight: '1.875rem' }],
+        '23': ['1.4375rem', { lineHeight: '2rem' }],
+        '27': ['1.6875rem', { lineHeight: '2.25rem' }],
+        '31': ['1.9375rem', { lineHeight: '2.5rem' }],
+      },
+
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

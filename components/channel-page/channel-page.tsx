@@ -1,10 +1,10 @@
 'use client'
 
 import { useConvex } from 'convex/react'
+import { useEffect, useState } from 'react'
 import { ThemeSwitcher } from '../theme-switcher'
 import { LogsBrowser } from './logs-browser'
 import { SearchInput } from './search-input'
-import { useEffect, useState } from 'react'
 import { SearchResultsBrowser } from './search-results-browser'
 
 export function ChannelPage({ channel }: { channel: string }) {
