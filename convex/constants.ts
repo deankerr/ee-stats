@@ -1,1 +1,1 @@
-export const EVENT_NAMES = ['message', 'action', 'join', 'part', 'quit', 'nick', 'topic', 'invite']
+export const EVENT_NAMES = ['message', 'action', 'join', 'part', 'quit', 'nick', 'topic', 'invite', 'mode']

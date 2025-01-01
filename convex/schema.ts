@@ -12,8 +12,15 @@ export default defineSchema({
     content: v.string(),
   })
     .index('channel', ['channel', 'timestamp'])
+    .index('channel_nick', ['channel', 'nick', 'timestamp'])
     .searchIndex('messages', {
       searchField: 'content',
       filterFields: ['channel', 'timestamp', 'category', 'type', 'nick'],
     }),
+
+  log_users: defineTable({
+    channel: v.string(),
+    nick: v.string(),
+    alias: v.optional(v.string()),
+  }).index('channel', ['channel']),
 })

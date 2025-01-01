@@ -6,4 +6,7 @@ const app = defineApp()
 
 app.use(migrations)
 
+app.use(aggregate, { name: 'agg_nick_activity' })
+app.use(aggregate, { name: 'agg_nsnick_timestamp' })
+
 export default app
