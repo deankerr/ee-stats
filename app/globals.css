@@ -100,4 +100,17 @@
   .stack {
     @apply grid [&>*]:col-start-1 [&>*]:row-start-1;
   }
+
+  @keyframes flash {
+    0% {
+      background-color: hsl(var(--primary) / 0.2);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  .flash {
+    animation: flash 1s ease-out;
+  }
 }
