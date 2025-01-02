@@ -8,30 +8,40 @@ export const LogEntryLine = memo(
     name,
     content,
     timestamp,
+    children,
+    showDate = false,
     ...props
   }: {
     type: string
     name: string
     content: string
     timestamp: number
+    showDate?: boolean
   } & React.ComponentPropsWithRef<'div'>) => {
-    const nickColor = type === 'message' ? getNameColorText(name) : 'font-normal'
+    const isMessage = type === 'message'
+    const nameTextColor = getNameColorText(name)
     const contentColor = type === 'message' ? 'text-foreground' : 'text-muted-foreground'
     return (
-      <div className="flex" {...props}>
-        <div className="flex-none font-medium text-muted-foreground sm:whitespace-pre">
-          {formatTimestamp(timestamp)}
-          <span className={nickColor}>{formatName(name).padStart(19)}</span>
+      <>
+        <div className="flex" {...props}>
+          <div className="flex-none sm:whitespace-pre">
+            <span className="text-foreground/90">{formatTimestamp(timestamp, showDate)}</span>
+            <span className={isMessage ? nameTextColor : 'text-muted-foreground'}>
+              {formatName(name).padStart(20)}
+            </span>
+          </div>
+          <div
+            className={cn(
+              'ml-[1ch] overflow-hidden break-words border-l pl-[1ch] sm:whitespace-pre-wrap',
+              contentColor,
+            )}
+          >
+            {formatContent(type, content)}
+          </div>
         </div>
-        <div
-          className={cn(
-            'ml-[1ch] overflow-hidden break-words border-l pl-[1ch] sm:whitespace-pre-wrap',
-            contentColor,
-          )}
-        >
-          {formatContent(type, content)}
-        </div>
-      </div>
+
+        {children}
+      </>
     )
   },
 )
@@ -85,10 +95,16 @@ function linkifyContent(text: string): React.ReactNode {
   return parts
 }
 
-function formatTimestamp(timestamp: number): string {
-  return new Date(timestamp)
-    .toLocaleString('en-CA', {
-      hour12: false,
-    })
-    .replace(',', '')
+function formatTimestamp(timestamp: number, showDate: boolean): string {
+  if (showDate) {
+    return new Date(timestamp)
+      .toLocaleString('en-CA', {
+        hour12: false,
+      })
+      .replace(',', '')
+  }
+
+  return new Date(timestamp).toLocaleTimeString('en-CA', {
+    hour12: false,
+  })
 }

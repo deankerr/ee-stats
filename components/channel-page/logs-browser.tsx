@@ -39,6 +39,8 @@ export function LogsBrowser({ channel }: { channel: string }) {
     status,
   } = usePaginatedQuery(api.queries.paginate, { channel }, { initialNumItems })
 
+  const logEntries = results.toReversed()
+
   const loadMore = useCallback(() => {
     loadMoreQuery(loadMoreNumItems)
   }, [loadMoreQuery])
@@ -80,17 +82,30 @@ export function LogsBrowser({ channel }: { channel: string }) {
           enabled={isLoading}
         />
 
-        {results.toReversed().map((item, i) => (
-          <LogEntryLine
-            id={`ee-log-entry-${results.length - i}`}
-            key={item.id}
-            type={item.type}
-            name={item.nick}
-            content={item.content}
-            timestamp={item.timestamp}
-            className={cn('flex snap-start py-0.5 hover:bg-muted/50', i + 1 === results.length && 'snap-end')}
-          />
-        ))}
+        {logEntries.map((item, i) => {
+          const next = logEntries.at(i + 1)
+          const nextDateMarker =
+            next && new Date(item.timestamp).getDate() !== new Date(next.timestamp).getDate()
+              ? new Date(next.timestamp).toDateString()
+              : undefined
+
+          return (
+            <LogEntryLine
+              id={`ee-log-entry-${results.length - i}`}
+              key={item.id}
+              type={item.type}
+              name={item.nick}
+              content={item.content}
+              timestamp={item.timestamp}
+              className={cn(
+                'flex snap-start py-0.5 hover:bg-muted/50',
+                i + 1 === results.length && 'snap-end',
+              )}
+            >
+              {nextDateMarker && <div className="text-center">--- {nextDateMarker} ---</div>}
+            </LogEntryLine>
+          )
+        })}
 
         <div className="h-2" />
       </div>
