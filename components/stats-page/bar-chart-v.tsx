@@ -1,6 +1,6 @@
 'use client'
 
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { ChartConfig, ChartContainer } from '@/components/ui/chart'
 import { Bar, BarChart, LabelList, XAxis, YAxis } from 'recharts'
 
 export function BarChartV2({
@@ -17,19 +17,18 @@ export function BarChartV2({
         data={data}
         layout="vertical"
         margin={{
-          left: 80,
+          left: 100,
         }}
       >
         <YAxis
           dataKey="user"
           type="category"
           tickLine={false}
-          tickMargin={10}
+          tickMargin={6}
           axisLine={false}
           tickFormatter={(value) => (config[value]?.label as string) ?? ''}
         />
         <XAxis dataKey="activity" type="number" hide />
-        <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel className="font-sans" />} />
         <Bar dataKey="activity" layout="vertical" radius={5}>
           <LabelList
             dataKey="activity"

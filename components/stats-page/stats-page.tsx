@@ -2,6 +2,7 @@
 
 import { api } from '@/convex/_generated/api'
 import { useQuery } from '@/lib/api'
+import { formatName, getNameColorHex } from '@/lib/names'
 import React from 'react'
 import { PageHeader } from '../page-header'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
@@ -141,25 +142,36 @@ function Chart2({ channel }: { channel: string }) {
   const data = useActivityData(channel)
   if (!data) return <div>loading...</div>
 
-  const chartData = data.nicks
-    .slice(0, 30)
-    .map(({ nick, total }) => ({ user: nick, activity: total, fill: `var(--color-${nick})` }))
+  const nameActivityData = data.nicks.slice(0, 30).map(({ nick, total }) => ({
+    id: nick.replaceAll(/[\[\]{}()]/g, '_'),
+    label: formatName(nick),
+    activity: total,
+    hex: getNameColorHex(nick),
+  }))
+
+  const chartData = nameActivityData.map(({ id, activity, hex }) => ({
+    user: id,
+    activity,
+    fill: hex,
+  }))
 
   const chartConfig = {
     activity: {
       label: 'Activity',
     },
     ...Object.fromEntries(
-      chartData.map(({ user }, i) => [
-        user,
+      nameActivityData.map(({ id, label, hex }) => [
+        id,
         {
-          label: user.slice(0, 16),
-          color: `hsl(var(--chart-${i + 1}))`,
+          label,
+          color: hex,
         },
       ]),
     ),
   }
 
+  console.log('chartData', chartData)
+  console.log('chartConfig', chartConfig)
   return (
     <div>
       <BarChartV2 data={chartData} config={chartConfig} />
