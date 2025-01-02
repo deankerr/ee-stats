@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { format } from 'node:path'
-import type { LogEntry } from '@/convex/types'
+import type { Doc } from '@/convex/_generated/dataModel'
 import type { WithoutSystemFields } from 'convex/server'
 import { drop } from 'remeda'
 
@@ -8,7 +8,7 @@ const OUTPUT_DIR = '.logs'
 const OUTPUT_VALUES = true
 const OUTPUT_ENTRIES = true
 
-type LogEntryFields = WithoutSystemFields<LogEntry>
+type LogEntryFields = WithoutSystemFields<Doc<'log_entries'>>
 
 async function main() {
   const inputPath = process.argv[2]
@@ -17,16 +17,16 @@ async function main() {
 }
 await main()
 
-function getCategory(type: string): LogEntry['category'] {
+function getCategory(type: string): LogEntryFields['category'] {
   return ['message', 'action'].includes(type) ? ('message' as const) : ('status' as const)
 }
 
 export async function parseFileToLogEntries(inputPath: string, channel: string) {
   const t = Date.now()
-  const logEntryFields = (await readFile(inputPath, { encoding: 'utf8' }))
-    .split('\n')
-    .filter((l) => l)
-    .map((line) => parseLogLine(line, channel))
+  const rawLines = (await readFile(inputPath, { encoding: 'utf8' })).split('\n').filter((l) => l)
+  dupeCheck(rawLines)
+
+  const logEntryFields = rawLines.map((line) => parseLogLine(line, channel))
 
   if (OUTPUT_ENTRIES)
     await writeFile(await getOutputPath(`${channel}.entries.jsonl`), serializeToJSONL(logEntryFields))
@@ -35,6 +35,14 @@ export async function parseFileToLogEntries(inputPath: string, channel: string) 
 
   console.log('parse', logEntryFields.length, 'lines,', Date.now() - t, 'ms')
   return logEntryFields
+}
+
+function dupeCheck(lines: string[]) {
+  const set = new Set<string>()
+  for (const [i, line] of lines.entries()) {
+    if (set.has(line)) console.log('[dupe]', i, line)
+    set.add(line)
+  }
 }
 
 function parseLogLine(line: string, channel: string): LogEntryFields {
