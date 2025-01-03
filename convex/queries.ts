@@ -3,7 +3,7 @@ import { paginationOptsValidator } from 'convex/server'
 import { v } from 'convex/values'
 import type { Doc } from './_generated/dataModel'
 import { query } from './_generated/server'
-import { aggNickActivity, aggNSNickTimestamp } from './aggregate'
+import { aggNickActivity, aggNSNickTimestamp, aggregates } from './aggregate'
 import { getDistinctNicksForChannel } from './helpers'
 import type { LogEntry } from './types'
 
@@ -41,6 +41,49 @@ export const paginate = query({
       .order('desc')
       .paginate(paginationOpts)
     return { ...result, page: result.page.map(transformLogEntry) }
+  },
+})
+
+export const getPage = query({
+  args: {
+    channel: v.string(),
+    offset: v.number(),
+    numItems: v.number(),
+  },
+  handler: async (ctx, { offset, numItems, channel }) => {
+    const { key: pageStart } = await aggregates.channel.timestamp.at(ctx, offset, {
+      namespace: channel,
+    })
+
+    const results = await ctx.db
+      .query('log_entries')
+      .withIndex('channel', (q) => q.eq('channel', channel).gte('timestamp', pageStart))
+      .take(numItems)
+
+    return results.map(transformLogEntry)
+  },
+})
+
+export const getPageFor = query({
+  args: {
+    channel: v.string(),
+    timestamp: v.number(),
+  },
+  handler: async (ctx, { channel, timestamp }) => {
+    const rangeBefore = 10
+    const rangeAfter = 40
+    const index = await aggregates.channel.timestamp.indexOf(ctx, timestamp, { namespace: channel })
+
+    const { key: pageStart } = await aggregates.channel.timestamp.at(ctx, index - rangeBefore, {
+      namespace: channel,
+    })
+
+    const results = await ctx.db
+      .query('log_entries')
+      .withIndex('channel', (q) => q.eq('channel', channel).gte('timestamp', pageStart))
+      .take(rangeBefore + rangeAfter + 1)
+
+    return results.map(transformLogEntry)
   },
 })
 

@@ -1,6 +1,7 @@
 import { api } from '@/convex/_generated/api'
 import { useStableQuery } from '@/hooks/use-stable-query'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { CLILoadingSpinner } from './cli-spinner'
 import { LogEntryLine } from './log-entry-line'
@@ -37,7 +38,11 @@ export function SearchResultsBrowser({ channel }: { channel: string }) {
           timestamp={item.timestamp}
           showDate
           className="flex py-2 hover:bg-muted/50"
-        />
+        >
+          <Link className="link text-right text-sm" href={`/channel/${channel}/time/${item.timestamp}`}>
+            jump to
+          </Link>
+        </LogEntryLine>
       ))}
 
       {results?.length === 0 && (

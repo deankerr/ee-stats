@@ -25,11 +25,26 @@ export const aggNSNickTimestamp = new TableAggregate<{
   sortKey: (doc) => doc.timestamp,
 })
 
+export const aggregates = {
+  channel: {
+    timestamp: new TableAggregate<{
+      Namespace: string
+      Key: number
+      DataModel: DataModel
+      TableName: 'log_entries'
+    }>(components.aggregate_channel_timestamp, {
+      namespace: (doc) => doc.channel,
+      sortKey: (doc) => doc.timestamp,
+    }),
+  },
+}
+
 export const aggsOnInsert = async (ctx: MutationCtx, id: Id<'log_entries'>) => {
   const log = await ctx.db.get(id)
   if (!log) return
   await aggNickActivity.insert(ctx, log)
   await aggNSNickTimestamp.insert(ctx, log)
+  await aggregates.channel.timestamp.insert(ctx, log)
 }
 
 export const getAggs = query({
@@ -43,27 +58,8 @@ export const getAggs = query({
     const upper = new Date(lower)
     upper.setUTCDate(upper.getUTCDate() + 1)
 
-    console.log('bounds', upper, lower)
-
-    const totals: [string, number][] = []
-    for await (const namespace of aggNSNickTimestamp.iterNamespaces(ctx)) {
-      const total = await aggNSNickTimestamp.count(ctx, {
-        namespace,
-        bounds: {
-          upper: {
-            key: upper.getTime(),
-            inclusive: false,
-          },
-          lower: {
-            key: lower.getTime(),
-            inclusive: true,
-          },
-        },
-      })
-      totals.push([namespace, total])
-    }
-
-    return totals
+    const total = await aggregates.channel.timestamp.count(ctx, { namespace: 'cupcake', bounds: {} })
+    return total
   },
 })
 
@@ -74,8 +70,9 @@ export const run = migrations.runner()
 export const backfillAggregatesMigration = migrations.define({
   table: 'log_entries',
   migrateOne: async (ctx, doc) => {
-    await aggNickActivity.insertIfDoesNotExist(ctx, doc)
-    await aggNSNickTimestamp.insertIfDoesNotExist(ctx, doc)
+    // await aggNickActivity.insertIfDoesNotExist(ctx, doc)
+    // await aggNSNickTimestamp.insertIfDoesNotExist(ctx, doc)
+    await aggregates.channel.timestamp.insertIfDoesNotExist(ctx, doc)
   },
 })
 
