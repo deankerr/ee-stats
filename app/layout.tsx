@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ClientProviders } from './client-providers'
+import { fontsMap } from './fonts/fonts'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,7 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${Object.values(fontsMap)
+          .map((font) => font.variable)
+          .join(' ')} font-mono`}
+      >
         <NuqsAdapter>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <ClientProviders>{children}</ClientProviders>

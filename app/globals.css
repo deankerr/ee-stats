@@ -80,7 +80,7 @@
   }
 
   body {
-    @apply min-h-dvh overscroll-y-none bg-background font-mono text-foreground antialiased;
+    @apply min-h-dvh overscroll-y-none bg-background text-foreground antialiased;
   }
 }
 

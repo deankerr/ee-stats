@@ -4,7 +4,7 @@ import { ThemeSwitcher } from './theme-switcher'
 
 export function PageHeader({ channel, page }: { channel: string; page: 'feed' | 'stats' }) {
   return (
-    <header className="sticky top-0 z-10 grid flex-none grid-cols-3 items-center bg-background px-[2ch] py-2 text-15 shadow-sm">
+    <header className="sticky top-0 z-10 grid flex-none grid-cols-3 items-center bg-background px-[2ch] py-2 shadow-sm">
       <div className="flex items-center gap-2">
         <h1>
           #{channel}/{page}

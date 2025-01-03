@@ -34,6 +34,7 @@ export async function parseFileToLogEntries(inputPath: string, channel: string) 
     await writeFile(await getOutputPath(`${channel}.values.jsonl`), serializeToJSONLValues(logEntryFields))
 
   console.log('parse', logEntryFields.length, 'lines,', Date.now() - t, 'ms')
+  getStats(logEntryFields)
   return logEntryFields
 }
 
@@ -43,6 +44,15 @@ function dupeCheck(lines: string[]) {
     if (set.has(line)) console.log('[dupe]', i, line)
     set.add(line)
   }
+}
+
+function getStats(entries: LogEntryFields[]) {
+  const typesCount: Record<string, number> = {}
+  for (const log of entries) {
+    typesCount[log.type] = (typesCount[log.type] ?? 0) + 1
+  }
+
+  console.log(typesCount)
 }
 
 function parseLogLine(line: string, channel: string): LogEntryFields {

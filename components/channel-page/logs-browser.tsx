@@ -62,9 +62,7 @@ export function LogsBrowser({ channel }: { channel: string }) {
     <div className="flex flex-col overflow-hidden">
       {/* scroll container */}
       <div
-        className={cn(
-          'flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden px-[1ch] text-15 leading-relaxed',
-        )}
+        className={cn('flex-1 snap-y snap-mandatory overflow-y-auto overflow-x-hidden px-[1ch]')}
         style={{
           scrollbarGutter: 'stable',
           overflowAnchor: 'none',
