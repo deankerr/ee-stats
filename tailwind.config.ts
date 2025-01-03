@@ -110,10 +110,32 @@ export default {
             transform: 'translateX(-100%)',
           },
         },
+        '-y-full': {
+          '0%': {
+            transform: 'translateX(0)',
+          },
+          '100%': {
+            transform: 'translateY(-100%)',
+          },
+        },
+        blink: {
+          '0%': {
+            opacity: '100%',
+          },
+          '15%': {
+            opacity: '0%',
+          },
+          '30%': {
+            opacity: '100%',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        blink1: 'blink 1s infinite',
+        'step-up-4': '-y-full 1s steps(4, jump-end) infinite',
+        'step-up-10': '-y-full 1s steps(10, jump-end) infinite',
         'step-left-4': '-x-full 0.5s steps(4, jump-end) infinite',
         'step-left-10': '-x-full 1s steps(10, jump-end) infinite',
       },
