@@ -13,7 +13,8 @@ import { PieChart1 } from './pie-chart'
 
 const useActivityData = (channel: string) => {
   const data = useQuery(api.queries.activity, { channel })
-  return data
+  if (!data) return data
+  return { total: data.total, nicks: data.users }
 }
 
 export function StatsPage({ channel }: { channel: string }) {

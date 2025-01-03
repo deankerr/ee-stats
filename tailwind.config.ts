@@ -134,7 +134,7 @@ export default {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         blink1: 'blink 1s infinite',
-        'step-up-4': '-y-full 1s steps(4, jump-end) infinite',
+        'step-up-4': '-y-full 0.5s steps(4, jump-end) infinite',
         'step-up-10': '-y-full 1s steps(10, jump-end) infinite',
         'step-left-4': '-x-full 0.5s steps(4, jump-end) infinite',
         'step-left-10': '-x-full 1s steps(10, jump-end) infinite',

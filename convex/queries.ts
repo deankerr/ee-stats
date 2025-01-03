@@ -121,23 +121,34 @@ export const activity = query({
     const namespace = channel
     const total = await aggNickActivity.count(ctx, { namespace, bounds: {} })
 
-    const users = await ctx.db
+    const knownUsers = await ctx.db
       .query('log_users')
       .withIndex('channel', (q) => q.eq('channel', channel))
       .collect()
 
-    const result = {
-      total,
-      nicks: await asyncMap(users, async ({ nick }) => ({
+    const users = await asyncMap(knownUsers, async ({ nick }) => {
+      const latestItemNode = await aggNSNickTimestamp.max(ctx, {
+        namespace: nick,
+        bounds: {},
+      })
+
+      const latest = latestItemNode ? await ctx.db.get(latestItemNode.id) : null
+
+      return {
         nick,
         total: await aggNSNickTimestamp.count(ctx, {
           namespace: nick,
           bounds: {},
         }),
-      })),
-    }
+        latest: latest ? transformLogEntry(latest) : null,
+      }
+    })
 
-    result.nicks.sort((a, b) => b.total - a.total)
-    return result
+    users.sort((a, b) => b.total - a.total)
+
+    return {
+      total,
+      users,
+    }
   },
 })

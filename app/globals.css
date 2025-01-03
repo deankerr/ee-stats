@@ -4,6 +4,10 @@
 
 @layer base {
   :root {
+    --color-neutral-400: 0 0% 63.9%;
+    --color-neutral-500: 0 0% 45.1%;
+    --color-neutral-600: 0 0% 32.2%;
+
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -20,7 +24,7 @@
     --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
+    --border: var(--color-neutral-400);
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.2rem;
@@ -55,7 +59,7 @@
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
+    --border: var(--color-neutral-600);
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     --chart-1: 220 70% 50%;
