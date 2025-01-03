@@ -28,10 +28,12 @@ const mekSans = localFont({
 
 const jetbrains = JetBrains_Mono({
   variable: '--font-jetbrains',
+  subsets: ['latin-ext'],
 })
 
 const space = Space_Mono({
   variable: '--font-space',
+  subsets: ['latin-ext'],
   weight: '400',
 })
 
