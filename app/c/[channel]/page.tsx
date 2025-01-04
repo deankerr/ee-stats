@@ -3,7 +3,8 @@ import { ThemeSwitcher } from '@/components/theme-switcher'
 import { TUILoading } from '@/components/tui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Metadata } from 'next'
-import { StatsActivityAllTime } from './StatsActivityAllTime'
+import { StatsBarChartAllTime } from './stats-bar-chart-all-time.tsx'
+import { StatsTableAllTime } from './stats-table-all-time'
 
 export async function generateMetadata({
   params,
@@ -32,17 +33,15 @@ export default async function Page({ params }: { params: Promise<{ channel: stri
       <Tabs defaultValue="stats">
         <TabsList>
           <TabsTrigger value="stats">Stats</TabsTrigger>
-          <TabsTrigger value="today">Today</TabsTrigger>
+          <TabsTrigger value="chart">Chart</TabsTrigger>
           <TabsTrigger value="feed">Feed</TabsTrigger>
           <TabsTrigger value="search">Search</TabsTrigger>
         </TabsList>
         <TabsContent value="stats">
-          <StatsActivityAllTime channel={channel} />
+          <StatsTableAllTime channel={channel} />
         </TabsContent>
-        <TabsContent value="today" className="">
-          <div className="flex h-96">
-            <TUILoading />
-          </div>
+        <TabsContent value="chart" className="">
+          <StatsBarChartAllTime channel={channel} />
         </TabsContent>
       </Tabs>
     </div>

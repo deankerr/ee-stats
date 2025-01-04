@@ -12,9 +12,9 @@ import { BarChartV2 } from './bar-chart-v'
 import { PieChart1 } from './pie-chart'
 
 const useActivityData = (channel: string) => {
-  const data = useQuery(api.queries.activity, { channel })
+  const data = useQuery(api.v1.queries.activity, { channel })
   if (!data) return data
-  return { total: data.total, nicks: data.users }
+  return { total: data.total, nicks: data.aliases.map((d) => ({ ...d, nick: d.alias, total: d.count })) }
 }
 
 export function StatsPage({ channel }: { channel: string }) {

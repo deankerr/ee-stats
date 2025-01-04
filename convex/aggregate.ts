@@ -47,21 +47,21 @@ export const aggsOnInsert = async (ctx: MutationCtx, id: Id<'log_entries'>) => {
   await aggregates.channel.timestamp.insert(ctx, log)
 }
 
-export const getAggs = query({
-  args: {
-    dayOf: v.optional(v.number()),
-  },
-  handler: async (ctx, { dayOf = 1735748736342 }) => {
-    const lower = new Date(dayOf)
-    lower.setUTCHours(0, 0, 0, 0)
+// export const getAggs = query({
+//   args: {
+//     dayOf: v.optional(v.number()),
+//   },
+//   handler: async (ctx, { dayOf = 1735748736342 }) => {
+//     const lower = new Date(dayOf)
+//     lower.setUTCHours(0, 0, 0, 0)
 
-    const upper = new Date(lower)
-    upper.setUTCDate(upper.getUTCDate() + 1)
+//     const upper = new Date(lower)
+//     upper.setUTCDate(upper.getUTCDate() + 1)
 
-    const total = await aggregates.channel.timestamp.count(ctx, { namespace: 'cupcake', bounds: {} })
-    return total
-  },
-})
+//     const total = await aggregates.channel.timestamp.count(ctx, { namespace: 'cupcake', bounds: {} })
+//     return total
+//   },
+// })
 
 // * migrations
 export const migrations = new Migrations<DataModel>(components.migrations)

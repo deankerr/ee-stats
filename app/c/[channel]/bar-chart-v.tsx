@@ -3,11 +3,11 @@
 import { ChartConfig, ChartContainer } from '@/components/ui/chart'
 import { Bar, BarChart, LabelList, XAxis, YAxis } from 'recharts'
 
-export function BarChartV2({
+export function BarChartVertical({
   data,
   config,
 }: {
-  data: { user: string; activity: number; fill: string }[]
+  data: { user: string; amount: number; fill: string }[]
   config: ChartConfig
 }) {
   return (
@@ -17,7 +17,7 @@ export function BarChartV2({
         data={data}
         layout="vertical"
         margin={{
-          left: 20,
+          left: 100,
         }}
       >
         <YAxis
@@ -28,15 +28,9 @@ export function BarChartV2({
           axisLine={false}
           tickFormatter={(value) => (config[value]?.label as string) ?? ''}
         />
-        <XAxis dataKey="activity" type="number" hide />
-        <Bar dataKey="activity" layout="vertical" radius={5}>
-          <LabelList
-            dataKey="activity"
-            position="right"
-            offset={8}
-            className="fill-foreground"
-            fontSize={12}
-          />
+        <XAxis dataKey="amount" type="number" hide />
+        <Bar dataKey="amount" layout="vertical" radius={5}>
+          <LabelList dataKey="amount" position="right" offset={8} className="fill-foreground" fontSize={12} />
         </Bar>
       </BarChart>
     </ChartContainer>

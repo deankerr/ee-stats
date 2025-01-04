@@ -8,14 +8,14 @@ import { useQuery } from '@/lib/api'
 import React from 'react'
 import TimeAgo from 'react-timeago'
 
-const useActivityData = (channel: string) => {
-  const data = useQuery(api.queries.activity, { channel })
-  console.log('activity data', data)
-  return data
+const useAliasData = (channel: string) => {
+  const results = useQuery(api.v1.queries.activity, { channel })
+  console.log('alias data', results)
+  return results
 }
 
-export function StatsActivityAllTime({ channel }: { channel: string }) {
-  const data = useActivityData(channel)
+export function StatsTableAllTime({ channel }: { channel: string }) {
+  const data = useAliasData(channel)
   if (!data)
     return (
       <div className="flex h-96">
@@ -46,12 +46,12 @@ export function StatsActivityAllTime({ channel }: { channel: string }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.users.map((user, i) => (
-            <TableRow key={user.nick}>
+          {data.aliases.map((user, i) => (
+            <TableRow key={user._id}>
               <TableCell className="text-right"> {i + 1}</TableCell>
-              <TableCell className="truncate">{user.nick}</TableCell>
-              <TableCell className="text-right">{user.total}</TableCell>
-              <TableCell className="text-right">{((user.total / data.total) * 100).toFixed(1)}%</TableCell>
+              <TableCell className="truncate">{user.alias}</TableCell>
+              <TableCell className="text-right">{user.count}</TableCell>
+              <TableCell className="text-right">{((user.count / data.total) * 100).toFixed(1)}%</TableCell>
               <TableCell className="truncate text-right">
                 {user.latest?.timestamp && (
                   <TimeAgo
@@ -66,7 +66,16 @@ export function StatsActivityAllTime({ channel }: { channel: string }) {
                   />
                 )}
               </TableCell>
-              <TableCell className="truncate">{user.latest?.content.slice(0, 100)}</TableCell>
+              <TableCell className="truncate">
+                {'content' in user.random ? (
+                  <span>
+                    {user.random.event !== 'message' ? `(${user.random.event}) ` : ''}
+                    {`"${user.random.content}"`}
+                  </span>
+                ) : (
+                  'null?'
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
