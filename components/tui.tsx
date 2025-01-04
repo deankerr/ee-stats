@@ -60,7 +60,7 @@ export function TUISpinner({
 
 export function TUILoading() {
   return (
-    <TUIBox variant="default" className="m-auto w-fit text-center">
+    <TUIBox variant="double" className="m-auto w-fit text-center">
       <TUISpinner variant="line" />
       <span className="mx-[3ch]">LOADING</span>
       <TUISpinner variant="line" />

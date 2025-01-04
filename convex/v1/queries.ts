@@ -23,8 +23,15 @@ export const activity = query({
     })
 
     const total = await aggregatesv1.channel.timestamp.count(ctx, { namespace: channel, bounds: {} })
+    const first = await aggregatesv1.channel.timestamp.min(ctx, { namespace: channel, bounds: {} })
+    const latest = await aggregatesv1.channel.timestamp.max(ctx, { namespace: channel, bounds: {} })
 
-    return { total, aliases: aliasesWithQuote.sort((a, b) => b.count - a.count) }
+    return {
+      total,
+      firstTimestamp: first?.key,
+      latestTimestamp: latest?.key,
+      aliases: aliasesWithQuote.sort((a, b) => b.count - a.count),
+    }
   },
 })
 

@@ -64,6 +64,6 @@ export function formatName(name: string): string {
   return truncate(name, 18)
 }
 
-function truncate(input: string, maxLength: number): string {
+export function truncate(input: string, maxLength: number): string {
   return input.length > maxLength ? `${input.slice(0, maxLength)}…` : input
 }

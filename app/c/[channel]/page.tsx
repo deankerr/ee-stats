@@ -1,5 +1,5 @@
-import { SearchInput } from '@/components/search-input'
 import { ThemeSwitcher } from '@/components/theme-switcher'
+import { TUILoading } from '@/components/tui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Metadata } from 'next'
 import { StatsBarChartAllTime } from './stats-bar-chart-all-time'
@@ -21,30 +21,32 @@ export default async function Page({ params }: { params: Promise<{ channel: stri
   const channel = (await params).channel
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex justify-between">
+    <div className="flex min-h-dvh flex-col gap-2 p-4 pt-2">
+      <header className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">#{channel}</h2>
         <div className="flex gap-2">
-          <SearchInput />
-          <ThemeSwitcher />
+          <ThemeSwitcher variant="outline" />
         </div>
-      </div>
+      </header>
 
-      <Tabs defaultValue="stats">
-        <TabsList>
+      <Tabs defaultValue="stats" className="contents data-[state=active]:[&>div]:flex-1">
+        <TabsList className="self-start">
           <TabsTrigger value="stats">Stats</TabsTrigger>
-          <TabsTrigger value="chart">Chart</TabsTrigger>
           <TabsTrigger value="hours">Hours</TabsTrigger>
-          <TabsTrigger value="search">Search</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          {/* <TabsTrigger value="dev">Dev</TabsTrigger> */}
         </TabsList>
         <TabsContent value="stats">
           <StatsTableAllTime channel={channel} />
         </TabsContent>
-        <TabsContent value="chart" className="py-2">
+        <TabsContent value="hours" className="">
+          <StatsChannelActivityHours channel={channel} />
+        </TabsContent>
+        <TabsContent value="users" className="">
           <StatsBarChartAllTime channel={channel} />
         </TabsContent>
-        <TabsContent value="hours" className="py-2">
-          <StatsChannelActivityHours channel={channel} />
+        <TabsContent value="dev" className="">
+          <TUILoading />
         </TabsContent>
       </Tabs>
     </div>
