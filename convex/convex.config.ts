@@ -6,10 +6,6 @@ const app = defineApp()
 
 app.use(migrations)
 
-app.use(aggregate, { name: 'agg_nick_activity' })
-app.use(aggregate, { name: 'agg_nsnick_timestamp' })
-app.use(aggregate, { name: 'aggregate_channel_timestamp' })
-
 app.use(aggregate, { name: 'v1_aggregate_channel_timestamp' })
 app.use(aggregate, { name: 'v1_aggregate_alias_channel_timestamp' })
 

@@ -1,9 +1,8 @@
-import { SearchInput } from '@/components/channel-page/search-input'
+import { SearchInput } from '@/components/search-input'
 import { ThemeSwitcher } from '@/components/theme-switcher'
-import { TUILoading } from '@/components/tui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Metadata } from 'next'
-import { StatsBarChartAllTime } from './stats-bar-chart-all-time.tsx'
+import { StatsBarChartAllTime } from './stats-bar-chart-all-time'
 import { StatsTableAllTime } from './stats-table-all-time'
 
 export async function generateMetadata({
@@ -40,7 +39,7 @@ export default async function Page({ params }: { params: Promise<{ channel: stri
         <TabsContent value="stats">
           <StatsTableAllTime channel={channel} />
         </TabsContent>
-        <TabsContent value="chart" className="">
+        <TabsContent value="chart">
           <StatsBarChartAllTime channel={channel} />
         </TabsContent>
       </Tabs>

@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils'
 import { SearchIcon, XIcon } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
 
 export function SearchInput({ className }: { className?: string }) {
   const [search, setSearch] = useQueryState('search')

@@ -1,12 +1,10 @@
 import { TableAggregate, type Item } from '@convex-dev/aggregate'
-import { Migrations } from '@convex-dev/migrations'
 import { asyncMap } from 'convex-helpers'
-import type { WithoutSystemFields } from 'convex/server'
 import { ConvexError, v } from 'convex/values'
 import { components, internal } from '../_generated/api'
-import { DataModel, type Doc, type Id } from '../_generated/dataModel'
-import { internalMutation, query, type MutationCtx } from '../_generated/server'
-import { migrations } from '../aggregate'
+import { DataModel, type Id } from '../_generated/dataModel'
+import { internalMutation } from '../_generated/server'
+import { migrations } from '../migrations'
 
 export const aggregatesv1 = {
   channel: {
