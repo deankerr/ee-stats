@@ -27,3 +27,26 @@ export const activity = query({
     return { total, aliases: aliasesWithQuote.sort((a, b) => b.count - a.count) }
   },
 })
+
+export const channelActivity = query({
+  args: {
+    channel: v.string(),
+  },
+  handler: async (ctx, { channel }) => {
+    const hoursCount: Map<number, number> = new Map([...Array(24)].map((_, i) => [i, 0]))
+
+    for (const hour of hoursCount.keys()) {
+      const count = await aggregatesv1.channel.hour_entryId.count(ctx, {
+        namespace: channel,
+        bounds: {
+          prefix: [hour],
+        },
+      })
+
+      hoursCount.set(hour, count)
+    }
+
+    console.log(hoursCount)
+    return [...hoursCount]
+  },
+})

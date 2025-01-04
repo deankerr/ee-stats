@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { api } from '@/convex/_generated/api'
 import { useQuery } from '@/lib/api'
-import React from 'react'
 import TimeAgo from 'react-timeago'
 
 const useAliasData = (channel: string) => {
@@ -24,7 +23,7 @@ export function StatsTableAllTime({ channel }: { channel: string }) {
     )
 
   return (
-    <div className="space-y-6 py-3">
+    <div className="space-y-4 py-2">
       <div className="flex">
         <Card className="rounded-lg">
           <CardHeader>

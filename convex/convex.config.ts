@@ -8,5 +8,6 @@ app.use(migrations)
 
 app.use(aggregate, { name: 'v1_aggregate_channel_timestamp' })
 app.use(aggregate, { name: 'v1_aggregate_alias_channel_timestamp' })
+app.use(aggregate, { name: 'v1_aggregate_channel_hour_entryId' })
 
 export default app

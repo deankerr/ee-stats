@@ -1,9 +1,9 @@
-import { TableAggregate, type Item } from '@convex-dev/aggregate'
+import { DirectAggregate, TableAggregate, type Item } from '@convex-dev/aggregate'
 import { asyncMap } from 'convex-helpers'
 import { ConvexError, v } from 'convex/values'
 import { components, internal } from '../_generated/api'
 import { DataModel, type Id } from '../_generated/dataModel'
-import { internalMutation } from '../_generated/server'
+import { internalMutation, type MutationCtx } from '../_generated/server'
 import { migrations } from '../migrations'
 
 export const aggregatesv1 = {
@@ -17,6 +17,25 @@ export const aggregatesv1 = {
       namespace: (doc) => doc.channel,
       sortKey: (doc) => doc.timestamp,
     }),
+
+    hour_entryId: new DirectAggregate<{
+      Namespace: string
+      Key: [number]
+      Id: Id<'v1_log_entries'>
+      DataModel: DataModel
+    }>(components.v1_aggregate_channel_hour_entryId),
+
+    hour_entryId_helper: async (
+      ctx: MutationCtx,
+      {
+        namespace,
+        timestamp,
+        logEntryId,
+      }: { namespace: string; timestamp: number; logEntryId: Id<'v1_log_entries'> },
+    ) => {
+      const hour = new Date(timestamp).getUTCHours()
+      await aggregatesv1.channel.hour_entryId.insert(ctx, { namespace, key: [hour], id: logEntryId })
+    },
   },
 
   alias: {
@@ -86,8 +105,13 @@ function transformAggItem(item: Item<[string, number], Id<'v1_log_entries'>> | n
 export const backfillAggregatesMigration = migrations.define({
   table: 'v1_log_entries',
   migrateOne: async (ctx, doc) => {
-    await aggregatesv1.channel.timestamp.insertIfDoesNotExist(ctx, doc)
-    await aggregatesv1.alias.channel_timestamp.insertIfDoesNotExist(ctx, doc)
+    // await aggregatesv1.channel.timestamp.insertIfDoesNotExist(ctx, doc)
+    // await aggregatesv1.alias.channel_timestamp.insertIfDoesNotExist(ctx, doc)
+    await aggregatesv1.channel.hour_entryId_helper(ctx, {
+      namespace: doc.channel,
+      timestamp: doc.timestamp,
+      logEntryId: doc._id,
+    })
   },
 })
 

@@ -51,15 +51,13 @@ export function StatsBarChartAllTime({ channel }: { channel: string }) {
   }
 
   return (
-    <div className="space-y-6 py-3">
-      <Card>
-        <CardHeader>
-          <CardTitle>Activity - All Time</CardTitle>
-        </CardHeader>
-        <CardContent className="px-2">
-          <BarChartVertical data={chartData} config={chartConfig} />
-        </CardContent>
-      </Card>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Activity - All Time</CardTitle>
+      </CardHeader>
+      <CardContent className="px-2">
+        <BarChartVertical data={chartData} config={chartConfig} />
+      </CardContent>
+    </Card>
   )
 }

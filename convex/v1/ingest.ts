@@ -1,5 +1,5 @@
 import { asyncMap, omit } from 'convex-helpers'
-import { ConvexError, v } from 'convex/values'
+import { v } from 'convex/values'
 import { mutation } from '../_generated/server'
 import schema from '../schema'
 
