@@ -1,7 +1,7 @@
 'use client'
 
 import { TUILoading } from '@/components/tui'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { api } from '@/convex/_generated/api'
 import { useQuery } from '@/lib/api'
@@ -18,40 +18,8 @@ export function StatsTableAllTime({ channel }: { channel: string }) {
   const data = useAliasData(channel)
   if (!data) return <TUILoading />
 
-  const times = {
-    first: data.firstTimestamp ?? 0,
-    latest: data.latestTimestamp ?? 0,
-  }
-
-  const daysLogged = Math.ceil((times.latest - times.first) / (1000 * 60 * 60 * 24))
-
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Card className="w-48 rounded-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Lines</CardTitle>
-          </CardHeader>
-          <CardContent>{data.total} </CardContent>
-        </Card>
-
-        <Card className="w-48 rounded-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Days Logged</CardTitle>
-          </CardHeader>
-          <CardContent>{daysLogged}</CardContent>
-        </Card>
-
-        <Card className="w-48 rounded-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Last Updated</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TimeAgo date={times.latest} />
-          </CardContent>
-        </Card>
-      </div>
-
       <Card>
         <Table className="table-fixed">
           <TableHeader className="bg-muted/40 shadow">

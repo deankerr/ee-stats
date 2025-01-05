@@ -1,7 +1,70 @@
 import { asyncMap } from 'convex-helpers'
 import { v } from 'convex/values'
+import { ms } from 'itty-time'
 import { query } from '../_generated/server'
-import { aggregatesv1 } from './aggregates'
+import { aggregates_v1 } from './aggregates'
+
+export const channel = query({
+  args: {
+    channel: v.string(),
+  },
+  handler: async (ctx, { channel }) => {
+    const count = await aggregates_v1.channel.timestamp.count(ctx, { namespace: channel, bounds: {} })
+    const first = await aggregates_v1.channel.timestamp.min(ctx, { namespace: channel, bounds: {} })
+    const latest = await aggregates_v1.channel.timestamp.max(ctx, { namespace: channel, bounds: {} })
+
+    return {
+      count,
+      firstAt: first?.key,
+      latestAt: latest?.key,
+    }
+  },
+})
+
+export const recent = query({
+  args: {
+    channel: v.string(),
+  },
+  handler: async (ctx, { channel }) => {
+    const namespace = channel
+    const max = await aggregates_v1.channel.timestamp.max(ctx, { namespace, bounds: {} })
+    const latestAt = max?.key
+
+    // TODO
+    if (!latestAt) return
+    console.log('max', new Date(latestAt))
+    const latestAtDate = new Date(latestAt)
+
+    latestAtDate.setUTCHours(latestAtDate.getUTCHours() + 1, 0, 0, 0)
+
+    const latestHourTime = latestAtDate.getTime()
+
+    const hours = [...Array(24)].map((_, i) => i)
+    const hourCounts = await asyncMap(hours, async (hour) => {
+      const hourEnd = latestHourTime - ms('1 hour') * hour
+      const hourStart = latestHourTime - ms('1 hour') * (hour + 1)
+      return {
+        hourStart,
+        hourEnd,
+        count: await aggregates_v1.channel.timestamp.count(ctx, {
+          namespace,
+          bounds: {
+            upper: {
+              key: hourEnd,
+              inclusive: false,
+            },
+            lower: {
+              key: hourStart,
+              inclusive: true,
+            },
+          },
+        }),
+      }
+    })
+
+    return { last24Hours: hourCounts }
+  },
+})
 
 export const activity = query({
   args: {
@@ -22,9 +85,9 @@ export const activity = query({
       }
     })
 
-    const total = await aggregatesv1.channel.timestamp.count(ctx, { namespace: channel, bounds: {} })
-    const first = await aggregatesv1.channel.timestamp.min(ctx, { namespace: channel, bounds: {} })
-    const latest = await aggregatesv1.channel.timestamp.max(ctx, { namespace: channel, bounds: {} })
+    const total = await aggregates_v1.channel.timestamp.count(ctx, { namespace: channel, bounds: {} })
+    const first = await aggregates_v1.channel.timestamp.min(ctx, { namespace: channel, bounds: {} })
+    const latest = await aggregates_v1.channel.timestamp.max(ctx, { namespace: channel, bounds: {} })
 
     return {
       total,
@@ -43,7 +106,7 @@ export const channelActivity = query({
     const hoursCount: Map<number, number> = new Map([...Array(24)].map((_, i) => [i, 0]))
 
     for (const hour of hoursCount.keys()) {
-      const count = await aggregatesv1.channel.hour_entryId.count(ctx, {
+      const count = await aggregates_v1.channel.hour_entryId.count(ctx, {
         namespace: channel,
         bounds: {
           prefix: [hour],
@@ -53,7 +116,6 @@ export const channelActivity = query({
       hoursCount.set(hour, count)
     }
 
-    console.log(hoursCount)
     return [...hoursCount]
   },
 })
