@@ -7,7 +7,6 @@ import { useQuery } from '@/lib/api'
 
 const useAliasData = (channel: string) => {
   const results = useQuery(api.v1.queries.activity, { channel })
-  console.log('alias data', results)
   return results
 }
 

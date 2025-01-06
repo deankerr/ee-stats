@@ -8,8 +8,8 @@ export function ChannelOverview({ channel }: { channel: string }) {
     <div className="space-y-4">
       <StatsChannelCards channel={channel} />
 
-      <div className="grid grid-cols-5 gap-4">
-        <ChartRecentActivityArea channel={channel} />
+      <div className="grid grid-cols-6 gap-4">
+        <ChartRecentActivityArea channel={channel} className="col-span-full" />
         <Card className="col-span-2">
           <StatsUserTable channel={channel} />
         </Card>

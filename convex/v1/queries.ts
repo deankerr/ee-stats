@@ -1,6 +1,5 @@
 import { asyncMap } from 'convex-helpers'
 import { v } from 'convex/values'
-import { ms } from 'itty-time'
 import { query } from '../_generated/server'
 import { aggregates_v1 } from './aggregates'
 
@@ -29,40 +28,21 @@ export const recent = query({
     const namespace = channel
     const max = await aggregates_v1.channel.timestamp.max(ctx, { namespace, bounds: {} })
     const latestAt = max?.key
+    if (!latestAt) return null
 
-    // TODO
-    if (!latestAt) return
-    console.log('max', new Date(latestAt))
-    const latestAtDate = new Date(latestAt)
-
-    latestAtDate.setUTCHours(latestAtDate.getUTCHours() + 1, 0, 0, 0)
-
-    const latestHourTime = latestAtDate.getTime()
-
-    const hours = [...Array(24)].map((_, i) => i)
-    const hourCounts = await asyncMap(hours, async (hour) => {
-      const hourEnd = latestHourTime - ms('1 hour') * hour
-      const hourStart = latestHourTime - ms('1 hour') * (hour + 1)
-      return {
-        hourStart,
-        hourEnd,
+    const activityPerHour = await asyncMap(
+      getHourBoundsFrom(latestAt, 72),
+      async ({ timeFrom, timeTo, bounds }) => ({
+        timeFrom,
+        timeTo,
         count: await aggregates_v1.channel.timestamp.count(ctx, {
           namespace,
-          bounds: {
-            upper: {
-              key: hourEnd,
-              inclusive: false,
-            },
-            lower: {
-              key: hourStart,
-              inclusive: true,
-            },
-          },
+          bounds,
         }),
-      }
-    })
+      }),
+    )
 
-    return { last24Hours: hourCounts }
+    return { activityPerHour }
   },
 })
 
@@ -119,3 +99,29 @@ export const channelActivity = query({
     return [...hoursCount]
   },
 })
+
+function getHourBoundsFrom(time: number, hours: number) {
+  const date = new Date(time)
+  date.setUTCHours(date.getUTCHours() - hours + 1, 0, 0, 0)
+
+  return [...Array(hours)].map(() => {
+    const timeFrom = date.getTime()
+    date.setHours(date.getHours() + 1)
+    const timeTo = date.getTime()
+
+    return {
+      timeFrom,
+      timeTo,
+      bounds: {
+        lower: {
+          key: timeFrom,
+          inclusive: true,
+        },
+        upper: {
+          key: timeTo,
+          inclusive: false,
+        },
+      },
+    }
+  })
+}
