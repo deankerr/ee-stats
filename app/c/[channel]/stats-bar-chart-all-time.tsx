@@ -2,19 +2,12 @@
 
 import { TUILoading } from '@/components/tui'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { api } from '@/convex/_generated/api'
-import { useQuery } from '@/lib/api'
+import { useAliasDataQuery } from '@/lib/api'
 import { formatName, getNameColorHex } from '@/lib/names'
 import { BarChartVertical } from './bar-chart-v'
 
-const useAliasData = (channel: string) => {
-  const results = useQuery(api.v1.queries.activity, { channel })
-  console.log('alias data', results)
-  return results
-}
-
 export function StatsBarChartAllTime({ channel }: { channel: string }) {
-  const data = useAliasData(channel)
+  const data = useAliasDataQuery(channel)
   if (!data)
     return (
       <div className="flex h-96">

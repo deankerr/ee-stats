@@ -45,7 +45,13 @@ export function StatsChannelCards({ channel }: { channel: string }) {
           <CardTitle className="text-sm font-medium">Last Updated</CardTitle>
         </CardHeader>
         <CardContent>
-          <TimeAgo date={latestAt} />
+          <TimeAgo
+            date={latestAt}
+            formatter={(value, unit, suffix) => {
+              if (suffix === 'from now') return 'just now'
+              return `${value} ${unit}${value > 1 ? 's' : ''} ${suffix}`
+            }}
+          />
         </CardContent>
       </Card>
     </div>

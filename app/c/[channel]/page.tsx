@@ -1,11 +1,8 @@
 import { ThemeSwitcher } from '@/components/theme-switcher'
-import { TUILoading } from '@/components/tui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Metadata } from 'next'
 import { ChannelOverview } from './channel-overview'
 import { StatsBarChartAllTime } from './stats-bar-chart-all-time'
-import { StatsChannelActivityHours } from './stats-channel-activity-hours'
-import { StatsChannelCards } from './stats-channel-cards'
 import { StatsTableAllTime } from './stats-table-all-time'
 
 export async function generateMetadata({
@@ -35,27 +32,21 @@ export default async function Page({ params }: { params: Promise<{ channel: stri
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">#{channel}</h2>
         </div>
+
         <TabsList className="self-start">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="stats">Stats</TabsTrigger>
-          <TabsTrigger value="hours">Hours</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
-          {/* <TabsTrigger value="dev">Dev</TabsTrigger> */}
+          <TabsTrigger value="chart">Chart</TabsTrigger>
         </TabsList>
+
         <TabsContent value="overview">
           <ChannelOverview channel={channel} />
         </TabsContent>
-        <TabsContent value="stats">
+        <TabsContent value="users">
           <StatsTableAllTime channel={channel} />
         </TabsContent>
-        <TabsContent value="hours" className="">
-          <StatsChannelActivityHours channel={channel} />
-        </TabsContent>
-        <TabsContent value="users" className="">
+        <TabsContent value="chart">
           <StatsBarChartAllTime channel={channel} />
-        </TabsContent>
-        <TabsContent value="dev" className="">
-          <TUILoading />
         </TabsContent>
       </Tabs>
     </div>

@@ -3,19 +3,12 @@
 import { TUILoading } from '@/components/tui'
 import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { api } from '@/convex/_generated/api'
-import { useQuery } from '@/lib/api'
+import { useAliasDataQuery } from '@/lib/api'
 import { truncate } from '@/lib/names'
 import TimeAgo from 'react-timeago'
 
-const useAliasData = (channel: string) => {
-  const results = useQuery(api.v1.queries.activity, { channel })
-  console.log('alias data', results)
-  return results
-}
-
 export function StatsTableAllTime({ channel }: { channel: string }) {
-  const data = useAliasData(channel)
+  const data = useAliasDataQuery(channel)
   if (!data) return <TUILoading />
 
   return (
@@ -48,6 +41,7 @@ export function StatsTableAllTime({ channel }: { channel: string }) {
                         if (suffix === 'from now') return 'active'
                         if (unit === 'second') return 'active'
                         if (unit === 'minute') return 'active'
+                        if (unit === 'hour') return 'today'
                         return [value, `${unit}${value > 1 ? 's' : ''}`, suffix].join(' ')
                       }}
                     />

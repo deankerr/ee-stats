@@ -11,7 +11,7 @@ export function BarChartVertical({
   config: ChartConfig
 }) {
   return (
-    <ChartContainer config={config} className="min-h-[800px] w-full">
+    <ChartContainer config={config} className="aspect-auto h-[800px]">
       <BarChart
         accessibilityLayer
         data={data}

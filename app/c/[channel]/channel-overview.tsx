@@ -1,7 +1,5 @@
-import { Card } from '@/components/ui/card'
 import { ChartRecentActivityArea } from './chart-recent-activity-area'
 import { StatsChannelCards } from './stats-channel-cards'
-import { StatsUserTable } from './stats-user-table'
 
 export function ChannelOverview({ channel }: { channel: string }) {
   return (
@@ -10,9 +8,6 @@ export function ChannelOverview({ channel }: { channel: string }) {
 
       <div className="grid grid-cols-6 gap-4">
         <ChartRecentActivityArea channel={channel} className="col-span-full" />
-        <Card className="col-span-2">
-          <StatsUserTable channel={channel} />
-        </Card>
       </div>
     </div>
   )

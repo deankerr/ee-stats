@@ -42,11 +42,23 @@ export const recent = query({
       }),
     )
 
-    return { activityPerHour }
+    const activityPerDay = await asyncMap(
+      getDayBoundsFrom(latestAt, 30),
+      async ({ timeFrom, timeTo, bounds }) => ({
+        timeFrom,
+        timeTo,
+        count: await aggregates_v1.channel.timestamp.count(ctx, {
+          namespace,
+          bounds,
+        }),
+      }),
+    )
+
+    return { hours: activityPerHour, days: activityPerDay }
   },
 })
 
-export const activity = query({
+export const aliases = query({
   args: {
     channel: v.string(),
   },
@@ -107,6 +119,33 @@ function getHourBoundsFrom(time: number, hours: number) {
   return [...Array(hours)].map(() => {
     const timeFrom = date.getTime()
     date.setHours(date.getHours() + 1)
+    const timeTo = date.getTime()
+
+    return {
+      timeFrom,
+      timeTo,
+      bounds: {
+        lower: {
+          key: timeFrom,
+          inclusive: true,
+        },
+        upper: {
+          key: timeTo,
+          inclusive: false,
+        },
+      },
+    }
+  })
+}
+
+function getDayBoundsFrom(time: number, days: number) {
+  const date = new Date(time)
+  date.setHours(0, 0, 0, 0)
+  date.setDate(date.getDate() - days + 1)
+
+  return [...Array(days)].map(() => {
+    const timeFrom = date.getTime()
+    date.setDate(date.getDate() + 1)
     const timeTo = date.getTime()
 
     return {

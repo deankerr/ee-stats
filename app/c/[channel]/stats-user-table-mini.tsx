@@ -2,16 +2,10 @@
 
 import { TUILoading } from '@/components/tui'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { api } from '@/convex/_generated/api'
-import { useQuery } from '@/lib/api'
+import { useAliasDataQuery } from '@/lib/api'
 
-const useAliasData = (channel: string) => {
-  const results = useQuery(api.v1.queries.activity, { channel })
-  return results
-}
-
-export function StatsUserTable({ channel }: { channel: string }) {
-  const data = useAliasData(channel)
+export function StatsUserTableMini({ channel }: { channel: string }) {
+  const data = useAliasDataQuery(channel)
   if (!data) return <TUILoading />
 
   const aliases = data.aliases.slice(0, 12)
