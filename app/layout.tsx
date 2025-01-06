@@ -1,9 +1,9 @@
-import './globals.css'
 import type { Metadata } from 'next'
+import { ThemeProvider } from 'next-themes'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ClientProviders } from './client-providers'
-import { ThemeProvider } from 'next-themes'
+import './globals.css'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -12,7 +12,8 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
-  subsets: ['latin'],
+  subsets: ['latin-ext'],
+  fallback: ['monospace'],
 })
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} font-mono`}>
         <NuqsAdapter>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <ClientProviders>{children}</ClientProviders>
