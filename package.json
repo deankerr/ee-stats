@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "pnpm run '/^dev:.*/'",
+    "dev:next": "next dev --turbopack",
+    "dev:convex": "convex dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "convex:ts-api-spec": "pnpm convex-helpers ts-api-spec --output-file out/convex-api"
   },
   "dependencies": {
     "@convex-dev/aggregate": "^0.1.18",

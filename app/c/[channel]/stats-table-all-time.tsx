@@ -38,9 +38,9 @@ export function StatsTableAllTime({ channel }: { channel: string }) {
                       title={new Date(user.latest.timestamp).toString()}
                       date={user.latest.timestamp}
                       formatter={(value, unit, suffix) => {
-                        if (suffix === 'from now') return 'active'
-                        if (unit === 'second') return 'active'
-                        if (unit === 'minute') return 'active'
+                        if (suffix === 'from now') return 'today'
+                        if (unit === 'second') return 'today'
+                        if (unit === 'minute') return 'today'
                         if (unit === 'hour') return 'today'
                         return [value, `${unit}${value > 1 ? 's' : ''}`, suffix].join(' ')
                       }}
