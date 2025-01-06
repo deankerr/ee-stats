@@ -21,14 +21,14 @@ export default async function Page({ params }: { params: Promise<{ channel: stri
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex items-center justify-between border-b px-8 py-2">
+      <header className="flex items-center justify-between border-b px-2 py-2 sm:px-8">
         <h2 className="text-base font-semibold">ee-stats</h2>
         <div className="flex gap-2">
           <ThemeSwitcher variant="outline" />
         </div>
       </header>
 
-      <Tabs defaultValue="overview" className="flex-1 space-y-4 p-8 pt-4">
+      <Tabs defaultValue="overview" className="flex-1 space-y-4 p-2 pt-4 sm:p-8">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">#{channel}</h2>
         </div>

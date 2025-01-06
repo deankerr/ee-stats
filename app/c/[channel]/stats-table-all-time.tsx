@@ -29,7 +29,7 @@ export function StatsTableAllTime({ channel }: { channel: string }) {
             {data.aliases.map((user, i) => (
               <TableRow key={user._id}>
                 <TableCell className="text-right"> {i + 1}</TableCell>
-                <TableCell className="truncate">{user.alias}</TableCell>
+                <TableCell className="">{user.alias}</TableCell>
                 <TableCell className="text-right">{user.count}</TableCell>
                 <TableCell className="text-right">{((user.count / data.total) * 100).toFixed(1)}%</TableCell>
                 <TableCell className="truncate text-right">

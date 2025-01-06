@@ -25,22 +25,22 @@ export function StatsChannelCards({ channel }: { channel: string }) {
   const daysLogged = getDaysBetween(latestAt, firstAt)
 
   return (
-    <div className="flex gap-4">
-      <Card className="w-48 rounded-lg">
+    <div className="flex flex-wrap gap-4">
+      <Card className="w-40 rounded-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Total Lines</CardTitle>
         </CardHeader>
         <CardContent>{data.count}</CardContent>
       </Card>
 
-      <Card className="w-48 rounded-lg">
+      <Card className="w-40 rounded-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Days Logged</CardTitle>
         </CardHeader>
         <CardContent>{daysLogged}</CardContent>
       </Card>
 
-      <Card className="w-48 rounded-lg">
+      <Card className="w-40 rounded-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Last Updated</CardTitle>
         </CardHeader>
