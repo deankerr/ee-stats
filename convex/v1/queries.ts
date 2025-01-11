@@ -16,6 +16,10 @@ export const channel = query({
       count,
       firstAt: first?.key,
       latestAt: latest?.key,
+      artifacts: await ctx.db
+        .query('v1_channel_artifacts')
+        .withIndex('channel_alias', (q) => q.eq('channel', channel).eq('alias', undefined))
+        .collect(),
     }
   },
 })
@@ -164,3 +168,18 @@ function getDayBoundsFrom(time: number, days: number) {
     }
   })
 }
+
+export const user = query({
+  args: {
+    channel: v.string(),
+    user: v.string(),
+  },
+  handler: async (ctx, { channel, user }) => {
+    return {
+      artifacts: await ctx.db
+        .query('v1_channel_artifacts')
+        .withIndex('channel_alias', (q) => q.eq('channel', channel).eq('alias', user))
+        .collect(),
+    }
+  },
+})

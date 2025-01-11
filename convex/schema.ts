@@ -7,10 +7,11 @@ export default defineSchema({
     timestamp: v.number(),
     event: v.string(),
     significant: v.boolean(),
-    prefix: v.string(),
+    prefix: v.optional(v.string()),
     nick: v.string(),
     content: v.string(),
     alias: v.string(),
+    hostMask: v.optional(v.string()),
   })
     .index('channel', ['channel', 'timestamp'])
     .index('channel_alias', ['channel', 'alias'])
@@ -41,4 +42,11 @@ export default defineSchema({
   })
     .index('alias', ['alias'])
     .index('channel', ['channel']),
+
+  v1_channel_artifacts: defineTable({
+    channel: v.string(),
+    alias: v.optional(v.string()),
+    type: v.string(),
+    content: v.any(),
+  }).index('channel_alias', ['channel', 'alias']),
 })

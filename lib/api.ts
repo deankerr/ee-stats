@@ -15,3 +15,7 @@ export function useRecentActivityQuery(channel: string) {
 export function useAliasDataQuery(channel: string) {
   return useQuery(api.v1.queries.aliases, { channel })
 }
+
+export function useUserQuery(channel: string, user: string) {
+  return useQuery(api.v1.queries.user, { channel, user })
+}

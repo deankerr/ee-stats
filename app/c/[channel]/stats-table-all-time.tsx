@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useAliasDataQuery } from '@/lib/api'
 import { truncate } from '@/lib/names'
+import Link from 'next/link'
 import TimeAgo from 'react-timeago'
 
 export function StatsTableAllTime({ channel }: { channel: string }) {
@@ -29,7 +30,14 @@ export function StatsTableAllTime({ channel }: { channel: string }) {
             {data.aliases.map((user, i) => (
               <TableRow key={user._id}>
                 <TableCell className="text-right"> {i + 1}</TableCell>
-                <TableCell className="">{user.alias}</TableCell>
+                <TableCell className="">
+                  <Link
+                    href={`/c/${channel}/user/${encodeURIComponent(user.alias)}`}
+                    className="link decoration-dashed"
+                  >
+                    {user.alias}
+                  </Link>
+                </TableCell>
                 <TableCell className="text-right">{user.count}</TableCell>
                 <TableCell className="text-right">{((user.count / data.total) * 100).toFixed(1)}%</TableCell>
                 <TableCell className="truncate text-right">

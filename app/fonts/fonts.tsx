@@ -1,48 +1,12 @@
-import { JetBrains_Mono, Space_Mono } from 'next/font/google'
-import localFont from 'next/font/local'
+import { Geist, Geist_Mono } from 'next/font/google'
 
-const fantasque = localFont({
-  src: './FantasqueSansMono-Regular.woff2',
-  variable: '--font-fantasque',
+export const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 })
 
-const hack = localFont({
-  src: './Hack-Regular.ttf',
-  variable: '--font-hack',
-})
-
-const iAWriterDuo = localFont({
-  src: './iAWriterDuoS-Regular.woff2',
-  variable: '--font-ia-writer-duo',
-})
-
-const iAWriterMono = localFont({
-  src: './iAWriterMonoS-Regular.woff2',
-  variable: '--font-ia-writer-mono',
-})
-
-const mekSans = localFont({
-  src: './MEKSans-Regular.woff2',
-  variable: '--font-mek-sans',
-})
-
-const jetbrains = JetBrains_Mono({
-  variable: '--font-jetbrains',
+export const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
   subsets: ['latin-ext'],
+  fallback: ['monospace'],
 })
-
-const space = Space_Mono({
-  variable: '--font-space',
-  subsets: ['latin-ext'],
-  weight: '400',
-})
-
-export const fontsMap = {
-  fantasque,
-  hack,
-  iAWriterDuo,
-  iAWriterMono,
-  jetbrains,
-  mekSans,
-  space,
-}

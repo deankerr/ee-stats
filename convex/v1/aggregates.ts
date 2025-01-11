@@ -123,16 +123,23 @@ export const backfillAggregatesMigration = migrations.define({
   migrateOne: async (ctx, doc) => {
     await aggregates_v1.channel.timestamp.insertIfDoesNotExist(ctx, doc)
     await aggregates_v1.alias.channel_timestamp.insertIfDoesNotExist(ctx, doc)
-    // await aggregates_v1.channel.hour_entryId_helper(ctx, {
-    //   namespace: doc.channel,
-    //   timestamp: doc.timestamp,
-    //   logEntryId: doc._id,
-    // })
   },
 })
 
 export const run_backfillAggregatesMigration = migrations.runner(
   internal.v1.aggregates.backfillAggregatesMigration,
+)
+
+export const migrateNewChannelTimestampAggregate = migrations.define({
+  table: 'v1_log_entries',
+  customRange: (q) => q.withIndex('channel', (q) => q.eq('channel', 'rawr')),
+  migrateOne: async (ctx, doc) => {
+    await aggregates_v1.channel.timestamp.insert(ctx, doc)
+  },
+})
+
+export const run_migrateNewChannelTimestampAggregate = migrations.runner(
+  internal.v1.aggregates.migrateNewChannelTimestampAggregate,
 )
 
 export const clearAggregates = internalMutation({
