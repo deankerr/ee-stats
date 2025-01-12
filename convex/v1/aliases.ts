@@ -13,7 +13,10 @@ export const patchEntryAlias = internalMutation({
   handler: async (ctx, { entryId, alias }) => {
     const entry = await ctx.db.get(entryId)
     if (!entry) throw new ConvexError('invalid entry id')
-    console.log('entry:', entry, 'new alias:', alias)
+    if (entry.alias === alias)
+      throw new ConvexError({ message: 'entry already has that alias', alias, entry })
+
+    console.log(new Date(entry.timestamp).toISOString(), entry.alias, '->', alias, `(${entry.nick})`)
 
     await ctx.db.patch(entryId, { alias })
     await aggregates_v1.alias.channel_timestamp.replace(ctx, entry, { ...entry, alias })
@@ -27,6 +30,17 @@ export const materializeAliasStats = internalMutation({
   },
   handler: async (ctx, args) => {
     await updateAliasData(ctx, args)
+  },
+})
+
+export const materializeChannelAliasStats = internalMutation({
+  args: {
+    channel: v.string(),
+  },
+  handler: async (ctx, { channel }) => {
+    for await (const alias of aggregates_v1.alias.channel_timestamp.iterNamespaces(ctx)) {
+      await updateAliasData(ctx, { channel, alias })
+    }
   },
 })
 
@@ -67,43 +81,45 @@ export async function updateAliasData(
     .filter((q) => q.eq(q.field('channel'), channel))
     .first()
 
-  console.log('updateAliasData', channel, alias, existing?._id)
-  try {
-    const bounds = {
-      namespace: alias,
-      bounds: { prefix: [channel] as [string] },
-    }
+  const bounds = {
+    namespace: alias,
+    bounds: { prefix: [channel] as [string] },
+  }
 
-    const items = [
-      aggregates_v1.alias.channel_timestamp.min(ctx, bounds),
-      aggregates_v1.alias.channel_timestamp.max(ctx, bounds),
-      aggregates_v1.alias.channel_timestamp.random(ctx, bounds),
-    ] as const
-
-    const [first, latest, random] = await Promise.all(items)
-
-    const stats = {
-      count: await aggregates_v1.alias.channel_timestamp.count(ctx, bounds),
-      first: transformAggItem(first),
-      latest: transformAggItem(latest),
-      random: transformAggItem(random),
-    }
-
+  const min = await aggregates_v1.alias.channel_timestamp.min(ctx, bounds)
+  if (!min) {
+    console.log('no data for', alias)
     if (existing) {
-      await ctx.db.patch(existing._id, stats)
-    } else {
-      await ctx.db.insert('v1_log_alias_stats', {
-        channel,
-        alias,
-        ...stats,
-      })
-    }
-  } catch (err) {
-    console.error(alias, err)
-    if (err instanceof ConvexError && err.data.message === 'invalid aggregate item' && existing) {
-      console.log('removing alias record')
       await ctx.db.delete(existing._id)
     }
+    return
+  }
+
+  console.log('updateAliasData', channel, alias, existing?._id)
+
+  const items = [
+    aggregates_v1.alias.channel_timestamp.min(ctx, bounds),
+    aggregates_v1.alias.channel_timestamp.max(ctx, bounds),
+    aggregates_v1.alias.channel_timestamp.random(ctx, bounds),
+  ] as const
+
+  const [first, latest, random] = await Promise.all(items)
+
+  const stats = {
+    count: await aggregates_v1.alias.channel_timestamp.count(ctx, bounds),
+    first: transformAggItem(first),
+    latest: transformAggItem(latest),
+    random: transformAggItem(random),
+  }
+
+  if (existing) {
+    await ctx.db.patch(existing._id, stats)
+  } else {
+    await ctx.db.insert('v1_log_alias_stats', {
+      channel,
+      alias,
+      ...stats,
+    })
   }
 }
 
