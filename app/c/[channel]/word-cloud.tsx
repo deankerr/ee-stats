@@ -1,7 +1,9 @@
 'use client'
 
 import { geistMono } from '@/app/fonts/fonts'
+import { TUILoading } from '@/components/tui'
 import { useUserQuery } from '@/lib/api'
+import { ParentSize } from '@visx/responsive'
 import { scaleLog } from '@visx/scale'
 import { Text } from '@visx/text'
 import Wordcloud from '@visx/wordcloud/lib/Wordcloud'
@@ -11,7 +13,13 @@ export default function UserWordCloud({ channel, user }: { channel: string; user
   const userData = useUserQuery(channel, user)
 
   if (!userData) {
-    return userData === null ? <div>User not found.</div> : <div>Loading...</div>
+    return userData === null ? (
+      <div>User not found.</div>
+    ) : (
+      <div className="flex h-96">
+        <TUILoading />
+      </div>
+    )
   }
 
   if (userData.artifacts.length === 0) {
@@ -21,8 +29,10 @@ export default function UserWordCloud({ channel, user }: { channel: string; user
   const words: WordData[] = userData.artifacts[0].content
 
   return (
-    <div>
-      <WordCloud width={1200} height={700} showControls words={words} />
+    <div className="h-[96dvh] max-h-[900px] max-w-[1400px]">
+      <ParentSize>
+        {({ width, height }) => <WordCloud width={width} height={height} words={words} />}
+      </ParentSize>
     </div>
   )
 }
@@ -61,7 +71,7 @@ export function WordCloud({ width, height, words }: Props) {
   const fontSizeSetter = useCallback((datum: WordData) => fontScale(datum.value), [fontScale])
 
   return (
-    <div className="m-4 flex w-fit select-none rounded-md border border-muted">
+    <div className="flex select-none rounded-md border border-muted">
       <Wordcloud
         words={words}
         width={width}
