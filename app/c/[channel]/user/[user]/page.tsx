@@ -17,10 +17,10 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: Promise<{ channel: string; user: string }> }) {
   const channel = (await params).channel
-  const user = (await params).user
+  const user = decodeURIComponent((await params).user)
 
   return (
-    <Tabs defaultValue="word-cloud" className="flex-1 space-y-4 p-2 pt-4 sm:p-8">
+    <Tabs defaultValue="word-cloud" className="flex-1 space-y-4 p-2 pt-2 sm:p-8 sm:pt-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">
           <Link href={`/c/${channel}`} className="link decoration-dotted">
