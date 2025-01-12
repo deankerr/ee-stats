@@ -1,10 +1,9 @@
-import type { Item } from '@convex-dev/aggregate'
 import { asyncMap, omit } from 'convex-helpers'
-import { ConvexError, v } from 'convex/values'
-import type { Id } from '../_generated/dataModel'
-import { mutation, type MutationCtx } from '../_generated/server'
+import { v } from 'convex/values'
+import { mutation } from '../_generated/server'
 import schema from '../schema'
 import { aggregates_v1 } from './aggregates'
+import { updateAliasData } from './aliases'
 
 const vLogEntriesFields = schema.tables.v1_log_entries.validator.fields
 const vAddLogEntry = { ...omit(vLogEntriesFields, ['channel']) }
@@ -55,50 +54,3 @@ export const maintenance = mutation({
     await updateAliasData(ctx, { channel, alias })
   },
 })
-
-async function updateAliasData(ctx: MutationCtx, { channel, alias }: { channel: string; alias: string }) {
-  try {
-    const bounds = {
-      namespace: alias,
-      bounds: { prefix: [channel] as [string] },
-    }
-
-    const items = [
-      aggregates_v1.alias.channel_timestamp.min(ctx, bounds),
-      aggregates_v1.alias.channel_timestamp.max(ctx, bounds),
-      aggregates_v1.alias.channel_timestamp.random(ctx, bounds),
-    ] as const
-
-    const [first, latest, random] = await Promise.all(items)
-
-    const stats = {
-      count: await aggregates_v1.alias.channel_timestamp.count(ctx, bounds),
-      first: transformAggItem(first),
-      latest: transformAggItem(latest),
-      random: transformAggItem(random),
-    }
-
-    const existing = await ctx.db
-      .query('v1_log_alias_stats')
-      .withIndex('alias', (q) => q.eq('alias', alias))
-      .filter((q) => q.eq(q.field('channel'), channel))
-      .first()
-
-    if (existing) {
-      await ctx.db.patch(existing._id, stats)
-    } else {
-      await ctx.db.insert('v1_log_alias_stats', {
-        channel,
-        alias,
-        ...stats,
-      })
-    }
-  } catch (err) {
-    console.error(alias, err)
-  }
-}
-
-function transformAggItem(item: Item<[string, number], Id<'v1_log_entries'>> | null) {
-  if (!item) throw new ConvexError({ message: 'invalid aggregate item' })
-  return { id: item.id, timestamp: item.key[1] }
-}

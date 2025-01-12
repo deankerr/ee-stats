@@ -1,6 +1,5 @@
-import { DirectAggregate, TableAggregate, type Item } from '@convex-dev/aggregate'
-import { asyncMap } from 'convex-helpers'
-import { ConvexError, v } from 'convex/values'
+import { DirectAggregate, TableAggregate } from '@convex-dev/aggregate'
+import { v } from 'convex/values'
 import { components, internal } from '../_generated/api'
 import { DataModel, type Doc, type Id } from '../_generated/dataModel'
 import { internalMutation, type MutationCtx } from '../_generated/server'
@@ -54,68 +53,6 @@ export const aggregates_v1 = {
     await aggregates_v1.channel.timestamp.insert(ctx, doc)
     await aggregates_v1.alias.channel_timestamp.insert(ctx, doc)
   },
-}
-
-export const processAliasStats = internalMutation({
-  args: {
-    channel: v.string(),
-  },
-  handler: async (ctx, { channel }) => {
-    const aliases: string[] = []
-
-    for await (const alias of aggregates_v1.alias.channel_timestamp.iterNamespaces(ctx, 50)) {
-      if (alias) aliases.push(alias)
-    }
-
-    await asyncMap(aliases, async (alias) => {
-      try {
-        const bounds = {
-          namespace: alias,
-          bounds: { prefix: [channel] as [string] },
-        }
-
-        const items = [
-          aggregates_v1.alias.channel_timestamp.min(ctx, bounds),
-          aggregates_v1.alias.channel_timestamp.max(ctx, bounds),
-          aggregates_v1.alias.channel_timestamp.random(ctx, bounds),
-        ] as const
-
-        const [first, latest, random] = await Promise.all(items)
-
-        const stats = {
-          count: await aggregates_v1.alias.channel_timestamp.count(ctx, bounds),
-          first: transformAggItem(first),
-          latest: transformAggItem(latest),
-          random: transformAggItem(random),
-        }
-
-        const existing = await ctx.db
-          .query('v1_log_alias_stats')
-          .withIndex('alias', (q) => q.eq('alias', alias))
-          .filter((q) => q.eq(q.field('channel'), channel))
-          .first()
-
-        if (existing) {
-          await ctx.db.patch(existing._id, stats)
-        } else {
-          await ctx.db.insert('v1_log_alias_stats', {
-            channel,
-            alias,
-            ...stats,
-          })
-        }
-      } catch (err) {
-        console.error(alias, err)
-      }
-    })
-
-    console.log('aliases', aliases.length, aliases)
-  },
-})
-
-function transformAggItem(item: Item<[string, number], Id<'v1_log_entries'>> | null) {
-  if (!item) throw new ConvexError({ message: 'invalid aggregate item' })
-  return { id: item.id, timestamp: item.key[1] }
 }
 
 export const backfillAggregatesMigration = migrations.define({
