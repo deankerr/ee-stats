@@ -78,38 +78,9 @@ export const aliases = query({
       }
     })
 
-    const total = await aggregates_v1.channel.timestamp.count(ctx, { namespace: channel, bounds: {} })
-    const first = await aggregates_v1.channel.timestamp.min(ctx, { namespace: channel, bounds: {} })
-    const latest = await aggregates_v1.channel.timestamp.max(ctx, { namespace: channel, bounds: {} })
-
     return {
-      total,
-      firstTimestamp: first?.key,
-      latestTimestamp: latest?.key,
       aliases: aliasesWithQuote.sort((a, b) => b.count - a.count),
     }
-  },
-})
-
-export const channelActivity = query({
-  args: {
-    channel: v.string(),
-  },
-  handler: async (ctx, { channel }) => {
-    const hoursCount: Map<number, number> = new Map([...Array(24)].map((_, i) => [i, 0]))
-
-    for (const hour of hoursCount.keys()) {
-      const count = await aggregates_v1.channel.hour_entryId.count(ctx, {
-        namespace: channel,
-        bounds: {
-          prefix: [hour],
-        },
-      })
-
-      hoursCount.set(hour, count)
-    }
-
-    return [...hoursCount]
   },
 })
 

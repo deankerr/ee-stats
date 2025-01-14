@@ -3,14 +3,15 @@
 import { TUILoading } from '@/components/tui'
 import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useAliasDataQuery } from '@/lib/api'
+import { useAliasDataQuery, useChannelQuery } from '@/lib/api'
 import { truncate } from '@/lib/names'
 import Link from 'next/link'
 import TimeAgo from 'react-timeago'
 
 export function StatsTableAllTime({ channel }: { channel: string }) {
-  const data = useAliasDataQuery(channel)
-  if (!data) return <TUILoading />
+  const channelData = useChannelQuery(channel)
+  const aliasData = useAliasDataQuery(channel)
+  if (!aliasData || !channelData) return <TUILoading />
 
   return (
     <div className="space-y-4">
@@ -27,7 +28,7 @@ export function StatsTableAllTime({ channel }: { channel: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.aliases.map((user, i) => (
+            {aliasData.aliases.map((user, i) => (
               <TableRow key={user._id}>
                 <TableCell className="text-right"> {i + 1}</TableCell>
                 <TableCell className="">
@@ -39,7 +40,9 @@ export function StatsTableAllTime({ channel }: { channel: string }) {
                   </Link>
                 </TableCell>
                 <TableCell className="text-right">{user.count}</TableCell>
-                <TableCell className="text-right">{((user.count / data.total) * 100).toFixed(1)}%</TableCell>
+                <TableCell className="text-right">
+                  {((user.count / channelData.count) * 100).toFixed(1)}%
+                </TableCell>
                 <TableCell className="truncate text-right">
                   {user.latest?.timestamp && (
                     <TimeAgo
