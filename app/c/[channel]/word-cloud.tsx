@@ -1,53 +1,18 @@
 'use client'
 
 import { geistMono } from '@/app/fonts/fonts'
-import { TUILoading } from '@/components/tui'
-import { useUserQuery } from '@/lib/api'
-import { ParentSize } from '@visx/responsive'
 import { scaleLog } from '@visx/scale'
 import { Text } from '@visx/text'
 import Wordcloud from '@visx/wordcloud/lib/Wordcloud'
 import { useCallback, useMemo } from 'react'
 
-export default function UserWordCloud({ channel, user }: { channel: string; user: string }) {
-  const userData = useUserQuery(channel, user)
-
-  if (!userData) {
-    return userData === null ? (
-      <div>User not found.</div>
-    ) : (
-      <div className="flex h-96">
-        <TUILoading />
-      </div>
-    )
-  }
-
-  if (userData.artifacts.length === 0) {
-    return <div>Nothing found for this user.</div>
-  }
-
-  const words: WordData[] = userData.artifacts[0].content
-
-  return (
-    <div className="h-[96dvh] max-h-[900px] max-w-[1400px]">
-      <ParentSize>
-        {({ width, height }) => <WordCloud width={width} height={height} words={words} />}
-      </ParentSize>
-    </div>
-  )
-}
-
-interface Props {
-  width: number
-  height: number
-  showControls?: boolean
-  words: WordData[]
-}
-
-export interface WordData {
+type WordData = {
   text: string
   value: number
 }
+
+const defaultHeight = 640
+const defaultWidth = 985
 
 const colors = [
   'hsl(var(--chart-1))',
@@ -60,26 +25,38 @@ const colors = [
 function getFontScale(words: WordData[]) {
   return scaleLog({
     domain: [Math.min(...words.map((w) => w.value)), Math.max(...words.map((w) => w.value))],
-    range: [20, 85],
+    range: [14, 48],
   })
 }
 
 const fixedValueGenerator = () => 0.5
 
-export function WordCloud({ width, height, words }: Props) {
-  const fontScale = useMemo(() => getFontScale(words), [words])
+export function WordCloud({
+  width = defaultWidth,
+  height = defaultHeight,
+  words,
+  limit,
+}: {
+  width?: number
+  height?: number
+  words: WordData[]
+  limit?: number
+}) {
+  const wordData = limit ? words.slice(0, limit) : words
+
+  const fontScale = useMemo(() => getFontScale(wordData), [wordData])
   const fontSizeSetter = useCallback((datum: WordData) => fontScale(datum.value), [fontScale])
 
   return (
-    <div className="flex select-none rounded-md border border-muted">
+    <div className="w-fit select-none rounded-md border border-muted">
       <Wordcloud
-        words={words}
+        words={wordData}
         width={width}
         height={height}
         fontSize={fontSizeSetter}
         font={geistMono.style.fontFamily}
         fontWeight={500}
-        padding={5}
+        padding={4}
         spiral={'archimedean'}
         rotate={0}
         random={fixedValueGenerator}

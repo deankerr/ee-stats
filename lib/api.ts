@@ -16,6 +16,6 @@ export function useAliasDataQuery(channel: string) {
   return useQuery(api.v1.queries.aliases, { channel })
 }
 
-export function useUserQuery(channel: string, user: string) {
-  return useQuery(api.v1.queries.user, { channel, user })
+export function useArtifactQuery(channel: string, alias: string) {
+  return useQuery(api.v1.queries.artifact, { channel, alias })
 }

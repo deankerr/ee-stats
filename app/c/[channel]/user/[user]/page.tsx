@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import UserWordCloud from '../../word-cloud'
+import { ArtifactWordCloud } from '../../artifact-word-cloud'
 
 export async function generateMetadata({
   params,
@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: Promise<{ channel: stri
       </TabsList>
 
       <TabsContent value="word-cloud">
-        <UserWordCloud channel={channel} user={user} />
+        <ArtifactWordCloud channel={channel} alias={user} />
       </TabsContent>
     </Tabs>
   )

@@ -8,10 +8,12 @@
  * @module
  */
 
+import type * as common from "../common.js";
 import type * as constants from "../constants.js";
 import type * as migrations from "../migrations.js";
 import type * as v1_aggregates from "../v1/aggregates.js";
 import type * as v1_aliases from "../v1/aliases.js";
+import type * as v1_artifacts from "../v1/artifacts.js";
 import type * as v1_ingest from "../v1/ingest.js";
 import type * as v1_queries from "../v1/queries.js";
 
@@ -29,10 +31,12 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  common: typeof common;
   constants: typeof constants;
   migrations: typeof migrations;
   "v1/aggregates": typeof v1_aggregates;
   "v1/aliases": typeof v1_aliases;
+  "v1/artifacts": typeof v1_artifacts;
   "v1/ingest": typeof v1_ingest;
   "v1/queries": typeof v1_queries;
 }>;

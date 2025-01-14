@@ -1,7 +1,8 @@
 import { asyncMap } from 'convex-helpers'
-import { v } from 'convex/values'
 import { query } from '../_generated/server'
+import { v } from '../common'
 import { aggregates_v1 } from './aggregates'
+import { vArtifacts } from './artifacts'
 
 export const channel = query({
   args: {
@@ -16,10 +17,6 @@ export const channel = query({
       count,
       firstAt: first?.key,
       latestAt: latest?.key,
-      artifacts: await ctx.db
-        .query('v1_channel_artifacts')
-        .withIndex('channel_alias', (q) => q.eq('channel', channel).eq('alias', undefined))
-        .collect(),
     }
   },
 })
@@ -169,17 +166,25 @@ function getDayBoundsFrom(time: number, days: number) {
   })
 }
 
-export const user = query({
+export const artifact = query({
   args: {
     channel: v.string(),
-    user: v.string(),
+    alias: v.string(),
   },
-  handler: async (ctx, { channel, user }) => {
+  returns: v.object({
+    wordCloud: v.nullable(vArtifacts.word_cloud),
+  }),
+
+  handler: async (ctx, { channel, alias }) => {
+    const wordCloud = await ctx.db
+      .query('v1_channel_artifacts')
+      .withIndex('channel_alias', (q) => q.eq('channel', channel).eq('alias', alias))
+      .order('desc')
+      .filter((q) => q.eq(q.field('type'), 'word_cloud'))
+      .first()
+
     return {
-      artifacts: await ctx.db
-        .query('v1_channel_artifacts')
-        .withIndex('channel_alias', (q) => q.eq('channel', channel).eq('alias', user))
-        .collect(),
+      wordCloud,
     }
   },
 })

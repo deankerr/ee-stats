@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "convex:ts-api-spec": "pnpm convex-helpers ts-api-spec --output-file out/convex-api"
+    "convex:ts-api-spec": "pnpm convex-helpers ts-api-spec"
   },
   "dependencies": {
     "@convex-dev/aggregate": "^0.1.18",

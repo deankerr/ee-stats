@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useSessionStorage } from '@reactuses/core'
+import { ArtifactWordCloud } from './artifact-word-cloud'
 import { ChannelOverview } from './channel-overview'
 import { StatsBarChartAllTime } from './stats-bar-chart-all-time'
 import { StatsTableAllTime } from './stats-table-all-time'
@@ -21,7 +22,8 @@ export function ChannelPage({ channel }: { channel: string }) {
       <TabsList className="self-start">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="users">Users</TabsTrigger>
-        <TabsTrigger value="chart">Chart</TabsTrigger>
+        <TabsTrigger value="chart">Total Lines</TabsTrigger>
+        <TabsTrigger value="word_cloud">Word Cloud</TabsTrigger>
       </TabsList>
 
       <TabsContent value="overview">
@@ -32,6 +34,9 @@ export function ChannelPage({ channel }: { channel: string }) {
       </TabsContent>
       <TabsContent value="chart">
         <StatsBarChartAllTime channel={channel} />
+      </TabsContent>
+      <TabsContent value="word_cloud">
+        <ArtifactWordCloud channel={channel} alias="*" />
       </TabsContent>
     </Tabs>
   )
