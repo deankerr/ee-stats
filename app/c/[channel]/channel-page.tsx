@@ -22,8 +22,8 @@ export function ChannelPage({ channel }: { channel: string }) {
       <TabsList className="self-start">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="users">Users</TabsTrigger>
-        <TabsTrigger value="chart">Total Lines</TabsTrigger>
-        <TabsTrigger value="word_cloud">Word Cloud</TabsTrigger>
+        <TabsTrigger value="chart">Lines</TabsTrigger>
+        <TabsTrigger value="word_cloud">Words</TabsTrigger>
       </TabsList>
 
       <TabsContent value="overview">

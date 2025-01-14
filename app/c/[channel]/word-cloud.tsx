@@ -11,16 +11,7 @@ type WordData = {
   value: number
 }
 
-const defaultHeight = 640
-const defaultWidth = 985
-
-const colors = [
-  'hsl(var(--chart-1))',
-  'hsl(var(--chart-2))',
-  'hsl(var(--chart-3)',
-  // 'hsl(var(--chart-4))',
-  'hsl(var(--chart-5))',
-]
+const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3)', 'hsl(var(--chart-5))']
 
 function getFontScale(words: WordData[]) {
   return scaleLog({
@@ -32,8 +23,8 @@ function getFontScale(words: WordData[]) {
 const fixedValueGenerator = () => 0.5
 
 export function WordCloud({
-  width = defaultWidth,
-  height = defaultHeight,
+  width = 600,
+  height = 400,
   words,
   limit,
 }: {
@@ -48,35 +39,33 @@ export function WordCloud({
   const fontSizeSetter = useCallback((datum: WordData) => fontScale(datum.value), [fontScale])
 
   return (
-    <div className="w-fit select-none rounded-md border border-muted">
-      <Wordcloud
-        words={wordData}
-        width={width}
-        height={height}
-        fontSize={fontSizeSetter}
-        font={geistMono.style.fontFamily}
-        fontWeight={500}
-        padding={4}
-        spiral={'archimedean'}
-        rotate={0}
-        random={fixedValueGenerator}
-      >
-        {(cloudWords) =>
-          cloudWords.map((w, i) => (
-            <Text
-              key={w.text}
-              fill={colors[i % colors.length]}
-              textAnchor={'middle'}
-              transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
-              fontSize={w.size}
-              fontWeight={w.weight}
-              fontFamily={w.font}
-            >
-              {w.text}
-            </Text>
-          ))
-        }
-      </Wordcloud>
-    </div>
+    <Wordcloud
+      words={wordData}
+      width={width}
+      height={height}
+      fontSize={fontSizeSetter}
+      font={geistMono.style.fontFamily}
+      fontWeight={500}
+      padding={4}
+      spiral={'archimedean'}
+      rotate={0}
+      random={fixedValueGenerator}
+    >
+      {(cloudWords) =>
+        cloudWords.map((w, i) => (
+          <Text
+            key={w.text}
+            fill={colors[i % colors.length]}
+            textAnchor={'middle'}
+            transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
+            fontSize={w.size}
+            fontWeight={w.weight}
+            fontFamily={w.font}
+          >
+            {w.text}
+          </Text>
+        ))
+      }
+    </Wordcloud>
   )
 }
