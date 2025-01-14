@@ -8,7 +8,7 @@ import { truncate } from '@/lib/names'
 import Link from 'next/link'
 import TimeAgo from 'react-timeago'
 
-export function StatsTableAllTime({ channel }: { channel: string }) {
+export function TableAliasStats({ channel }: { channel: string }) {
   const channelData = useChannelQuery(channel)
   const aliasData = useAliasDataQuery(channel)
   if (!aliasData || !channelData) return <TUILoading />

@@ -1,10 +1,10 @@
 'use client'
 
+import { WordCloud } from '@/components/charts/word-cloud'
 import { TUILoading } from '@/components/tui'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useArtifactQuery } from '@/lib/api'
 import { ScaleSVG } from '@visx/responsive'
-import { WordCloud } from './word-cloud'
 
 const WIDTH = 1000
 const HEIGHT = 650

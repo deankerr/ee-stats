@@ -3,9 +3,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useSessionStorage } from '@reactuses/core'
 import { ArtifactWordCloud } from './artifact-word-cloud'
-import { ChannelOverview } from './channel-overview'
-import { StatsBarChartAllTime } from './stats-bar-chart-all-time'
-import { StatsTableAllTime } from './stats-table-all-time'
+import { ChannelTabOverview } from './channel-tab-overview'
+import { ChartAliasLinesTotal } from './chart-alias-lines-total'
+import { TableAliasStats } from './table-alias-stats'
 
 export function ChannelPage({ channel }: { channel: string }) {
   const [tab, setTab] = useSessionStorage('tab', 'overview')
@@ -27,13 +27,13 @@ export function ChannelPage({ channel }: { channel: string }) {
       </TabsList>
 
       <TabsContent value="overview">
-        <ChannelOverview channel={channel} />
+        <ChannelTabOverview channel={channel} />
       </TabsContent>
       <TabsContent value="users">
-        <StatsTableAllTime channel={channel} />
+        <TableAliasStats channel={channel} />
       </TabsContent>
       <TabsContent value="chart">
-        <StatsBarChartAllTime channel={channel} />
+        <ChartAliasLinesTotal channel={channel} />
       </TabsContent>
       <TabsContent value="word_cloud">
         <ArtifactWordCloud channel={channel} alias="*" />

@@ -9,7 +9,7 @@ function getDaysBetween(time1: number, time2: number) {
   return Math.ceil((time1 - time2) / (1000 * 60 * 60 * 24))
 }
 
-export function StatsChannelCards({ channel }: { channel: string }) {
+export function ChannelStatsCards({ channel }: { channel: string }) {
   const data = useChannelQuery(channel)
 
   if (!data) {
@@ -26,21 +26,21 @@ export function StatsChannelCards({ channel }: { channel: string }) {
 
   return (
     <div className="flex flex-wrap gap-4">
-      <Card className="w-40 rounded-lg">
+      <Card className="rounded-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Total Lines</CardTitle>
         </CardHeader>
         <CardContent>{data.count}</CardContent>
       </Card>
 
-      <Card className="w-40 rounded-lg">
+      <Card className="rounded-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Days Logged</CardTitle>
         </CardHeader>
         <CardContent>{daysLogged}</CardContent>
       </Card>
 
-      <Card className="w-40 rounded-lg">
+      <Card className="rounded-lg">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Last Updated</CardTitle>
         </CardHeader>

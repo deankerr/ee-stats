@@ -24,7 +24,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ChartRecentActivityArea({
+export function ChartChannelRecentActivity({
   channel,
   ...props
 }: { channel: string } & React.ComponentPropsWithRef<typeof Card>) {
