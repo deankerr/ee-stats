@@ -12,16 +12,9 @@ function getDaysBetween(time1: number, time2: number) {
 export function ChannelStatsCards({ channel }: { channel: string }) {
   const data = useChannelQuery(channel)
 
-  if (!data) {
-    return (
-      <div className="flex gap-2">
-        <TUILoading />
-      </div>
-    )
-  }
-
-  const firstAt = data.firstAt ?? 0
-  const latestAt = data.latestAt ?? 0
+  const totalLines = data?.count ?? 0
+  const firstAt = data?.firstAt ?? 0
+  const latestAt = data?.latestAt ?? 0
   const daysLogged = getDaysBetween(latestAt, firstAt)
 
   return (
@@ -30,7 +23,7 @@ export function ChannelStatsCards({ channel }: { channel: string }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Total Lines</CardTitle>
         </CardHeader>
-        <CardContent>{data.count}</CardContent>
+        <CardContent>{totalLines}</CardContent>
       </Card>
 
       <Card className="rounded-lg">
@@ -54,6 +47,12 @@ export function ChannelStatsCards({ channel }: { channel: string }) {
           />
         </CardContent>
       </Card>
+
+      {!data && (
+        <div className="absolute inset-x-0 flex h-96">
+          <TUILoading />
+        </div>
+      )}
     </div>
   )
 }

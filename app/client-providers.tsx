@@ -15,7 +15,7 @@ export function ClientProviders({
 }>) {
   return (
     <ConvexProvider client={convex}>
-      <ConvexQueryCacheProvider expiration={1000 * 60}>
+      <ConvexQueryCacheProvider>
         <JotaiProvider>{children}</JotaiProvider>
       </ConvexQueryCacheProvider>
     </ConvexProvider>

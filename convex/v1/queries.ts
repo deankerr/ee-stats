@@ -3,6 +3,7 @@ import { query } from '../_generated/server'
 import { v } from '../common'
 import { aggregates_v1 } from './aggregates'
 import { vArtifacts } from './artifacts'
+import { getHourBoundsFrom } from './utils'
 
 export const channel = query({
   args: {
@@ -21,7 +22,7 @@ export const channel = query({
   },
 })
 
-export const recent = query({
+export const activity = query({
   args: {
     channel: v.string(),
   },
@@ -43,19 +44,7 @@ export const recent = query({
       }),
     )
 
-    const activityPerDay = await asyncMap(
-      getDayBoundsFrom(latestAt, 30),
-      async ({ timeFrom, timeTo, bounds }) => ({
-        timeFrom,
-        timeTo,
-        count: await aggregates_v1.channel.timestamp.count(ctx, {
-          namespace,
-          bounds,
-        }),
-      }),
-    )
-
-    return { hours: activityPerHour, days: activityPerDay }
+    return { hours: activityPerHour }
   },
 })
 
@@ -83,59 +72,6 @@ export const aliases = query({
     }
   },
 })
-
-function getHourBoundsFrom(time: number, hours: number) {
-  const date = new Date(time)
-  date.setUTCHours(date.getUTCHours() - hours + 1, 0, 0, 0)
-
-  return [...Array(hours)].map(() => {
-    const timeFrom = date.getTime()
-    date.setHours(date.getHours() + 1)
-    const timeTo = date.getTime()
-
-    return {
-      timeFrom,
-      timeTo,
-      bounds: {
-        lower: {
-          key: timeFrom,
-          inclusive: true,
-        },
-        upper: {
-          key: timeTo,
-          inclusive: false,
-        },
-      },
-    }
-  })
-}
-
-function getDayBoundsFrom(time: number, days: number) {
-  const date = new Date(time)
-  date.setHours(0, 0, 0, 0)
-  date.setDate(date.getDate() - days + 1)
-
-  return [...Array(days)].map(() => {
-    const timeFrom = date.getTime()
-    date.setDate(date.getDate() + 1)
-    const timeTo = date.getTime()
-
-    return {
-      timeFrom,
-      timeTo,
-      bounds: {
-        lower: {
-          key: timeFrom,
-          inclusive: true,
-        },
-        upper: {
-          key: timeTo,
-          inclusive: false,
-        },
-      },
-    }
-  })
-}
 
 export const artifact = query({
   args: {

@@ -11,7 +11,13 @@ import TimeAgo from 'react-timeago'
 export function TableAliasStats({ channel }: { channel: string }) {
   const channelData = useChannelQuery(channel)
   const aliasData = useAliasDataQuery(channel)
-  if (!aliasData || !channelData) return <TUILoading />
+  if (!aliasData || !channelData) {
+    return (
+      <div className="absolute inset-x-0 flex h-96">
+        <TUILoading />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">

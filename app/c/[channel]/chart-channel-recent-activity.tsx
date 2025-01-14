@@ -29,14 +29,11 @@ export function ChartChannelRecentActivity({
   ...props
 }: { channel: string } & React.ComponentPropsWithRef<typeof Card>) {
   const [timeRange, setTimeRange] = React.useState('72 hours')
-  const [units, period] = timeRange.split(' ')
+  const [period] = React.useState<'hours' | 'days'>('hours')
 
   const results = useRecentActivityQuery(channel)
-  if (!results) return null
 
-  const dataPeriod = results[period as keyof typeof results]
-  const data = dataPeriod.slice(dataPeriod.length - Number(units))
-
+  const data = results?.hours ?? []
   const totalLines = data.reduce((acc, item) => acc + item.count, 0)
 
   return (
@@ -46,22 +43,23 @@ export function ChartChannelRecentActivity({
           <CardTitle>Activity</CardTitle>
           <CardDescription>{`${totalLines} lines in the last ${timeRange}`}</CardDescription>
         </div>
-        <Select value={timeRange} onValueChange={setTimeRange}>
+        <Select value={timeRange} onValueChange={setTimeRange} disabled>
           <SelectTrigger className="w-[160px] rounded-lg sm:ml-auto" aria-label="Select a value">
-            <SelectValue placeholder="Last 3 months" />
+            <SelectValue placeholder="Last 72 Hours" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
             <SelectItem value="72 hours" className="rounded-lg">
               Last 72 Hours
             </SelectItem>
-            <SelectItem value="30 days" className="rounded-lg">
-              Last 30 days
-            </SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer config={chartConfig} className="aspect-auto h-[350px] w-full">
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[350px] w-full"
+          key={results ? 'loaded' : 'not loaded'}
+        >
           <AreaChart data={data}>
             <defs>
               <linearGradient id="fillActivity" x1="0" y1="0" x2="0" y2="1">

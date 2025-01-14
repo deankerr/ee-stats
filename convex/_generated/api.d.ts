@@ -16,6 +16,7 @@ import type * as v1_aliases from "../v1/aliases.js";
 import type * as v1_artifacts from "../v1/artifacts.js";
 import type * as v1_ingest from "../v1/ingest.js";
 import type * as v1_queries from "../v1/queries.js";
+import type * as v1_utils from "../v1/utils.js";
 
 import type {
   ApiFromModules,
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   "v1/artifacts": typeof v1_artifacts;
   "v1/ingest": typeof v1_ingest;
   "v1/queries": typeof v1_queries;
+  "v1/utils": typeof v1_utils;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 
